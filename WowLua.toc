@@ -1,0 +1,10 @@
+## Interface: 20300
+## Title: WowLua
+## Author: Cladhaire
+## Notes: Simple interactive Lua interpreter and scratchpad
+## SavedVariables: WowLuaDB
+
+WowLua.lua
+WowLuaFrame.lua
+FAIAP.lua
+WowLua.xml
