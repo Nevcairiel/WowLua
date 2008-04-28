@@ -496,6 +496,11 @@ end
 
 function WowLua.UpdateLineNums(highlightNum)
 	-- highlightNum is the line number indicated by the error message
+	if highlightNum then 
+		WowLua.highlightNum = highlightNum
+	else
+		highlightNum = WowLua.highlightNum
+	end
 
 	-- Since we know this is FAIAP enabled, we need to pass true in order
 	-- to get the raw values
@@ -511,8 +516,10 @@ function WowLua.UpdateLineNums(highlightNum)
 	local count = 1
 	for line in text:gmatch("([^\n]*\n?)") do
 		if #line > 0 then
+			ChatFrame1:AddMessage(count .. " hi: " .. tostring(highlightNum))
 			if count == highlightNum then
-				linetext = linetext .. "|cffff2222" .. count .. "|r\n"
+				ChatFrame1:AddMessage("got highlight")
+				linetext = linetext .. "|cFFFF1111" .. count .. "|r" .. "\n"
 			else
 				linetext = linetext .. count .. "\n"
 			end

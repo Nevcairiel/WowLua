@@ -445,7 +445,7 @@
 				self:ClearFocus();
 			  </OnEscapePressed>
 			  <OnTextChanged>
-				self.highlightNum = nil
+				WowLua.highlightNum = nil
 			  </OnTextChanged>
 			  <OnCursorChanged>
 				ScrollingEdit_OnCursorChanged(x,y,w,h)
