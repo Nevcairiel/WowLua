@@ -320,7 +320,7 @@ end
 
 local function slashHandler(txt)
 	local page = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaFrameEditBox:SetText(WowLuaDB.pages[page])
+	WowLuaFrameEditBox:SetText(WowLuaDB.pages[page] or "")
 	if WowLuaDB.currentPage == 1 then
 		WowLuaButton_Previous:Disable()
 		SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),true)
@@ -495,33 +495,51 @@ function WowLua.OnVerticalScroll(scrollFrame)
 end
 
 function WowLua.UpdateLineNums(highlightNum)
-	local text = WowLuaFrameEditBox:GetText()
+	-- highlightNum is the line number indicated by the error message
 
-	highlightNum = highlightNum or WowLuaFrameEditBox.highlightNum
+	-- Since we know this is FAIAP enabled, we need to pass true in order
+	-- to get the raw values
+	local editbox = WowLuaFrameEditBox
+	local linebox = WowLuaFrameLineNumEditBox
+	local linetest = WowLuaFrameEditBoxLineTest
+	local linescroll = WowLuaFrameLineNumScrollFrame
 
-	local lineText = ""
+	local width = editbox:GetWidth() 
+	local text = editbox:GetText(true)
+
+	local linetext = ""
 	local count = 1
+	for line in text:gmatch("([^\n]*\n?)") do
+		if #line > 0 then
+			if count == highlightNum then
+				linetext = linetext .. "|cffff2222" .. count .. "|r\n"
+			else
+				linetext = linetext .. count .. "\n"
+			end
+			count = count + 1
 
-	if count == highlightNum then
-		lineText = lineText .. "|cFFFF1111" .. count .. "|r" .. "\n"
-	else
-		lineText = lineText .. count .. "\n"
+			-- Check to see if the line of text spans more than one actual line
+			linetest:SetText(line:gsub("|", "||"))
+			local testwidth = linetest:GetWidth()
+			if testwidth >= width then
+				linetext = linetext .. string.rep("\n", testwidth / width) 
+			end
+		end
 	end
 
-	count = count + 1
-
-	for line in WowLuaFrameEditBox:GetText():gmatch("\n") do
-		if count == highlightNum then
-			lineText = lineText .. "|cFFFF1111" .. count .. "|r" .. "\n"
-		else
-			lineText = lineText .. count .. "\n"
-		end
-		
+	if text:sub(-1, -1) == "\n" then
+		linetext = linetext .. count .. "\n"
 		count = count + 1
 	end
-	WowLuaFrameLineNumEditBox:SetText(lineText)
-	WowLuaFrameEditBox.oldtext = text
-	WowLuaFrameEditBox.highlightNum = highlightNum
+
+	-- Make the line number frame wider as necessary
+	local offset = tostring(count):len() * 10
+	linescroll:ClearAllPoints()
+	linescroll:SetPoint("TOPLEFT", WowLuaFrame, "TOPLEFT", 18, -74)
+	linescroll:SetPoint("BOTTOMRIGHT", WowLuaFrameResizeBar, "TOPLEFT", 15 + offset, -4)
+
+	linebox:SetText(linetext)
+	linetest:SetText(text)
 end
 
 local function canScroll(scroll, direction)
@@ -581,5 +599,13 @@ function WowLua.ScrollingMessageFrameScroll(scroll, direction, type)
 	end
 	local method = scrollMethods[type][direction];
 	scroll[method](scroll);
+end
+
+function WowLua.OnTextChanged(self)
+	self.highlightNum = nil
+end
+
+function WowLua.OnCursorChanged(self)
+	WowLua.dirty = true
 end
 

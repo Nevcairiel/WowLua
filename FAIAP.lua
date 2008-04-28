@@ -1103,7 +1103,11 @@ local function onUpdateHook(editbox, ...)
 	end
 end
 
-local function newGetText(editbox)
+local function newGetText(editbox, raw)
+	if raw then
+		return lib.decode(editboxGetText(editbox))
+	end
+
 	local decoded = decodeCache[editbox]
 	if not decoded then
 		decoded = lib.decode(editboxGetText(editbox))

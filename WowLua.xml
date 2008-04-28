@@ -422,6 +422,15 @@
 			<Size>
 			  <AbsDimension x="100" y="100"/>
 			</Size>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentLineTest" font="Interface\AddOns\WowLua\fonts\VeraMono.ttf" hidden="true">
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
+						<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT"/>
+						<FontHeight val="14"/>
+					</FontString>
+				</Layer>
+			</Layers>
 			<Anchors>
 			  <Anchor point="TOPLEFT">
 				<Offset x="20" y="0"/>
