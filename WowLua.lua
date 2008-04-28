@@ -516,9 +516,7 @@ function WowLua.UpdateLineNums(highlightNum)
 	local count = 1
 	for line in text:gmatch("([^\n]*\n?)") do
 		if #line > 0 then
-			ChatFrame1:AddMessage(count .. " hi: " .. tostring(highlightNum))
 			if count == highlightNum then
-				ChatFrame1:AddMessage("got highlight")
 				linetext = linetext .. "|cFFFF1111" .. count .. "|r" .. "\n"
 			else
 				linetext = linetext .. count .. "\n"
