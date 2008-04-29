@@ -428,37 +428,21 @@ function WowLua.OnSizeChanged(self)
 		bg4:Hide()
 	end
 
-	if WowLuaFrameResizeBar then
-		-- Don't move too high, or too low
+	if WowLuaFrameResizeBar and false then
 		local parent = WowLuaFrameResizeBar:GetParent()
-		local top = parent:GetTop()
-		local bot = parent:GetBottom()
-		local maxpoint = (top - bot - 80) * -1
-		
-		-- This is the current point, actually
-		
+		local cursorY = select(2, GetCursorPosition())
 		local newPoint = select(5, WowLuaFrameResizeBar:GetPoint())
-		
-		-- Don't move past the edges of the frame
-		if newPoint < maxpoint then
-			newPoint = maxpoint
-		elseif newPoint > -125 then
-			newPoint = -125
-		end
-		
-		WowLuaFrameResizeBar:ClearAllPoints()
-		WowLuaFrameResizeBar:SetPoint("TOPLEFT", 14, newPoint)	
-		WowLuaFrameResizeBar:SetPoint("TOPRIGHT", 0, newPoint)
+		local maxPoint = parent:GetHeight() - 175; 
 
-		--[[
-		-- Get our bottom, and the bottom of the frame
-		local sbot,pbot = WowLuaFrameResizeBar:GetBottom(), parent:GetBottom()
-		-- Diff
-		local diff = pbot - sbot
-		local numLines = math.abs((diff / 14) + 1.3)
-		if numLines <= 1 then numLines = 1 end
-		WowLuaFrameOutput:SetMaxLines(numLines)
-		--]]
+		if newPoint < 100 then
+			newPoint = 100
+		elseif newPoint > maxPoint then
+			newPoint = maxPoint
+		end
+
+		WowLuaFrameResizeBar:ClearAllPoints()
+		WowLuaFrameResizeBar:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 14, newPoint)
+		WowLuaFrameResizeBar:SetPoint("TOPRIGHT", parent, "BOTTOMRIGHT", 0, newPoint)
 	end
 end
 
@@ -473,35 +457,20 @@ function WowLua.ResizeBar_OnMouseUp(self, button)
 end
 
 function WowLua.ResizeBar_OnUpdate(self, elapsed)
+	local parent = self:GetParent()
 	local cursorY = select(2, GetCursorPosition())
 	local newPoint = self.anchorStart - (self.cursorStart - cursorY)/self:GetEffectiveScale()
+	local maxPoint = parent:GetHeight() - 175; 
 
-	-- Don't move too high, or too low
-	local parent = self:GetParent()
-	local top = parent:GetTop()
-	local bot = parent:GetBottom()
-	local maxpoint = (top - bot - 80) * -1
-
-	-- Don't move past the edges of the frame
-	if newPoint < maxpoint then
-		newPoint = maxpoint
-	elseif newPoint > -125 then
-		newPoint = -125
+	if newPoint < 100 then
+		newPoint = 100
+	elseif newPoint > maxPoint then
+		newPoint = maxPoint
 	end
-	
-	self:ClearAllPoints()
-	self:SetPoint("TOPLEFT", 14, newPoint)	
-	self:SetPoint("TOPRIGHT", 0, newPoint)
 
-	--[[
-	-- Get our bottom, and the bottom of the frame
-	local sbot,pbot = self:GetBottom(), parent:GetBottom()
-	-- Diff
-	local diff = pbot - sbot
-	local numLines = math.abs((diff / 14) + 1.3)
-	if numLines <= 1 then numLines = 1 end
-	WowLuaFrameOutput:SetMaxLines(numLines)
-	--]]
+	self:ClearAllPoints()
+	self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 14, newPoint)
+	self:SetPoint("TOPRIGHT", parent, "BOTTOMRIGHT", 0, newPoint)
 end
 
 function WowLua.OnVerticalScroll(scrollFrame)
