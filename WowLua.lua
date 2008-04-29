@@ -11,7 +11,7 @@ WowLua = {
 
 WowLua_DB = {
 	pages = {
-		[1] = {name = "Untitled 1", content = ""}
+		[1] = {name = "Untitled 1", content = "", untitled = true}
 	},
 	currentPage = 1,
 	untitled = 2,
@@ -25,6 +25,7 @@ function WowLua:CreateNewPage()
 	local entry = {
 		name = name,
 		content = "",
+		untitled = true
 	}
 	table.insert(WowLua_DB.pages, entry)
 	WowLua_DB.currentPage = #WowLua_DB.pages
@@ -43,6 +44,7 @@ end
 function WowLua:RenamePage(num, name)
 	local entry = WowLua_DB.pages[num]
 	entry.name = name
+	entry.untitled = nil
 end
 
 function WowLua:DeletePage(num)
@@ -283,9 +285,13 @@ function WowLua:Button_OnClick(button)
 end
 
 function WowLua:Button_New(button)
-	-- Save the page we're currently editing
-	self:Button_Save()
-
+	if self:IsModified() then
+		-- Display the unsaved changes dialog
+		local dialog = StaticPopup_Show("WOWLUA_UNSAVED")
+		dialog.data = "Button_New"
+		return
+	end
+	
 	-- Create a new page and display it
 	local entry, num = WowLua:CreateNewPage()
 
@@ -295,10 +301,34 @@ function WowLua:Button_New(button)
 end
 
 function WowLua:Button_Open(button)
+	ToggleDropDownMenu(1, nil, WowLuaOpenDropDown, button:GetName(), 0, 0)
+end
+
+function WowLua:OpenDropDownOnLoad(frame)
+	UIDropDownMenu_Initialize(frame, self.OpenDropDownInitialize)
+end
+
+local function dropDownFunc(page)
+	WowLua:GoToPage(page)
+end
+
+function WowLua.OpenDropDownInitialize()
+	UIDropDownMenu_AddButton{
+		text = "Select a Script",
+		isTitle = 1
+	}
+	
+	for page, entry in ipairs(WowLua_DB.pages) do
+		UIDropDownMenu_AddButton{
+			text = entry.name,
+			func = dropDownFunc,
+			arg1 = page
+		}
+	end
 end
 
 StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
-	text = "Rename page '%s' to:",
+	text = "Save page with the following name:",
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
 	OnAccept = function()		
@@ -317,7 +347,10 @@ StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 	maxLetters = 32,
 	OnShow = function()
 		getglobal(this:GetName().."Button1"):Disable();
-		getglobal(this:GetName().."EditBox"):SetFocus();
+		local editBox = getglobal(this:GetName().."EditBox")
+		editBox:SetFocus()
+		editBox:SetText(WowLua.save_as_name)
+		editBox:HighlightText()
 	end,
 	OnHide = function()
 		if ( ChatFrameEditBox:IsVisible() ) then
@@ -351,11 +384,12 @@ StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 }
 
 function WowLua:Button_Save(button)
-	if button and IsShiftKeyDown() then
+	if button and (self:IsUntitled() or IsShiftKeyDown()) then
 		-- Show the static popup for renaming
 		local page, entry = self:GetCurrentPage()
 		WowLua.save_as = page
-		StaticPopup_Show("WOWLUA_SAVE_AS", entry.name)
+		WowLua.save_as_name = entry.name
+		StaticPopup_Show("WOWLUA_SAVE_AS")
 		return
 	else
 		local text = WowLuaFrameEditBox:GetText()
@@ -372,20 +406,20 @@ function WowLua:Button_Undo(button)
 end
 
 function WowLua:Button_Delete(button)
-	local entry, id = self:GetCurrentPage()
+	local page, entry = self:GetCurrentPage()
 
 	if self:GetNumPages() == 1 then
 		self:Button_New()
 		self:Button_Previous()
 	end
 
-	self:DeletePage(id)
+	self:DeletePage(page)
 	
-	if id > 1 then
-		local entry = self:SelectPage(id - 1)
-		WowLuaFrameEditBox:SetText(entry.content)
-		self.UpdateButtons()
-	end
+	if page > 1 then page = page - 1 end
+	local entry = self:SelectPage(page)
+	WowLuaFrameEditBox:SetText(entry.content)
+	self:UpdateButtons()
+	self:SetTitle(false)
 end
 
 function WowLua:Button_Lock(button)
@@ -405,9 +439,13 @@ StaticPopupDialogs["WOWLUA_UNSAVED"] = {
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
 	OnAccept = function()
-		local method = WowLua.previous_action
 		WowLua:Button_Undo()
-		WowLua[method](WowLua)
+		local action = this:GetParent().data
+		if type(action) == "string" then
+			WowLua[action](WowLua)
+		else
+			WowLua:GoToPage(this:GetParent().data)
+		end
 	end,
 	timeout = 0,
 	whileDead = 1,
@@ -421,31 +459,22 @@ StaticPopupDialogs["WOWLUA_UNSAVED"] = {
 }
 
 function WowLua:Button_Previous()
-	if self:IsModified() then
-		-- Display the unsaved changes dialog
-		self.previous_action = "Button_Previous"
-		StaticPopup_Show("WOWLUA_UNSAVED")
-		return
-	end
-
-	local current = self:GetCurrentPage()
-	local entry = self:SelectPage(current - 1)
-	
-	WowLuaFrameEditBox:SetText(entry.content)
-	self:UpdateButtons()
-	self:SetTitle(false)
+	self:GoToPage(self:GetCurrentPage() - 1)
 end
 
 function WowLua:Button_Next()
+	self:GoToPage(self:GetCurrentPage() + 1)
+end
+
+function WowLua:GoToPage(page)
 	if self:IsModified() then
 		-- Display the unsaved changes dialog
-		self.previous_action = "Button_Next"
-		StaticPopup_Show("WOWLUA_UNSAVED")
+		local dialog = StaticPopup_Show("WOWLUA_UNSAVED")
+		dialog.data = page
 		return
 	end
 
-	local current = self:GetCurrentPage()
-	local entry = self:SelectPage(current + 1)
+	local entry = self:SelectPage(page)
 	
 	WowLuaFrameEditBox:SetText(entry.content)
 	self:UpdateButtons()
@@ -472,10 +501,12 @@ function WowLua:UpdateButtons()
 	if self:IsPageLocked(current) then
 		WowLuaButton_Unlock:Show()
 		WowLuaButton_Lock:Hide()
+		WowLuaButton_Delete:Disable()
 		WowLuaFrameEditBox:SetScript("OnTextChanged", self.lockedTextChanged)
 	else
 		WowLuaButton_Unlock:Hide()
 		WowLuaButton_Lock:Show()
+		WowLuaButton_Delete:Enable()
 		WowLuaFrameEditBox:SetScript("OnTextChanged", self.unlockedTextChanged)
 	end
 end
@@ -530,6 +561,11 @@ function WowLua:IsModified()
 	local orig = entry.content
 	local current = WowLuaFrameEditBox:GetText(true)
 	return orig ~= current
+end
+
+function WowLua:IsUntitled()
+	local page, entry = self:GetCurrentPage()
+	return entry.untitled
 end
 
 function WowLua:SetTitle(modified)

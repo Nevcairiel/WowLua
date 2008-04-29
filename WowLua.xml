@@ -15,10 +15,10 @@
 		</Scripts>
 	</Button>
 
-	<Frame name="WowLuaOpenDropdown" inherits="UIDropDownMenuTemplate" frameStrata="FULLSCREEN_DIALOG">
+	<Frame name="WowLuaOpenDropDown" inherits="UIDropDownMenuTemplate" frameStrata="FULLSCREEN_DIALOG">
 		<Scripts>
 			<OnLoad>
-				--WowLua:OpenDropDownOnLoad(self)
+				WowLua:OpenDropDownOnLoad(self)
 			</OnLoad>
 		</Scripts>
 	</Frame>
