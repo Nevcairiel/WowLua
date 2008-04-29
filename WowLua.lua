@@ -5,25 +5,78 @@
   WowLua is an interactive interpreter for World of Warcraft
 --------------------------------------------------------------------------]]--
 
--- TODO:
--- * Make the scroll bars hide/show as necessary
--- * Implement each button as required
--- * Make line numbers line up with soft-wrapped lines
--- * Disable selection of line numbers. Actually, would it be possible to make
---   it select lines a la most other edtiors?
--- * There seems to be a missing background texture in the upper-left 6th or so of the window
--- * Resizing the window should grow the edit box vertically and leave the output window static.
--- * Profit!!!
- 
 WowLua = {
 	VERSION = "WowLua 1.0 Interactive Interpreter",
 }
 
-WowLuaDB = {
-	pages = { ["Untitled 1"] = "", [1] = "Untitled 1"},
+WowLua_DB = {
+	pages = {
+		[1] = {name = "Untitled 1", content = ""}
+	},
 	currentPage = 1,
-	untitled = 1,
+	untitled = 2,
 }
+
+local DB = {}
+
+function WowLua:CreateNewPage()
+	local name = "Untitled " .. WowLua_DB.untitled
+	WowLua_DB.untitled = WowLua_DB.untitled + 1
+	local entry = {
+		name = name,
+		content = "",
+	}
+	table.insert(WowLua_DB.pages, entry)
+	WowLua_DB.currentPage = #WowLua_DB.pages
+	return entry, #WowLua_DB.pages
+end
+
+function WowLua:GetNumPages()
+	return #WowLua_DB.pages
+end
+
+function WowLua:SavePage(num, content)
+	local entry = WowLua_DB.pages[num]
+	entry.content = content
+end
+
+function WowLua:RenamePage(num, name)
+	local entry = WowLua_DB.pages[num]
+	entry.name = name
+end
+
+function WowLua:DeletePage(num)
+	table.remove(WowLua_DB.pages, num)
+end
+
+function WowLua:LockPage(num, locked)
+	local entry = WowLua_DB.pages[num]
+	entry.locked = locked
+end
+
+function WowLua:IsPageLocked(num)
+	local entry = WowLua_DB.pages[num]
+	return entry.locked
+end
+
+function WowLua:GetCurrentPage()
+	local page = WowLua_DB.currentPage
+	return page, WowLua_DB.pages[page]
+end
+
+function WowLua:SelectPage(id)
+	if type(id) == "number" then
+		WowLua_DB.currentPage = id
+		return WowLua_DB.pages[id], id
+	elseif type(id) == "string" then
+		for idx,entry in ipairs(WowLuaDB.pages) do
+			if entry.name == id then
+				WowLua_DB.currentPage = idx
+				return entry, idx
+			end
+		end
+	end
+end
 
 local function wowpad_print(...)
 	local out = ""
@@ -52,8 +105,8 @@ local function processSpecialCommands(txt)
 		WowLuaFrame:SetWidth(640)
 		WowLuaFrame:SetHeight(512)
 		WowLuaFrameResizeBar:ClearAllPoints()
-		WowLuaFrameResizeBar:SetPoint("TOPLEFT", 14, -220)
-		WowLuaFrameResizeBar:SetPoint("TOPRIGHT", 0, -220)
+		WowLuaFrameResizeBar:SetPoint("TOPLEFT", WowLuaFrame, "BOTTOMLEFT", 14, 100)
+		WowLuaFrameResizeBar:SetPoint("TOPRIGHT", WowLuaFrame, "BOTTOMRIGHT", 0, 100)
 		return true
 	end
 end
@@ -130,7 +183,7 @@ function WowLua:ProcessLine(text)
 	end
 end
 
-function WowLua.RunScript(text)
+function WowLua:RunScript(text)
 	-- escape any color codes:
 	local output = text:gsub("\124", "\124\124")
 
@@ -170,16 +223,17 @@ function WowLua.RunScript(text)
 	return true
 end
 
-function WowLua.Initialize(self)
-	WowLua.OnSizeChanged(self)
+function WowLua:Initialize(frame)
+	WowLua:OnSizeChanged(frame)
 	table.insert(UISpecialFrames, "WowLuaFrame")
-			PlaySound("igMainMenuOpen");
+	PlaySound("igMainMenuOpen");
+	self:UpdateButtons()
 end
 
 local tooltips = {
 	["New"] = "Create a new script page",
 	["Open"] = "Open an existing script page",
-	["Save As"] = "Save the current page with a name",
+	["Save"] = "Save the current page\n\nHint: You can shift-click this button to rename a page",
 	["Undo"] = "Revert to the last saved version",
 	["Delete"] = "Delete the current page",
 	["Lock"] = "Locks/unlocks the current page from being changed",
@@ -188,9 +242,9 @@ local tooltips = {
 	["Run"] = "Run the current script",
 }	
 	
-function WowLua.Button_OnEnter(self)
+function WowLua:Button_OnEnter(frame)
 	GameTooltip:SetOwner(this, "ANCHOR_BOTTOM");
-	local operation = self:GetName():match("WowLuaButton_(.+)"):gsub("_", " ")
+	local operation = frame:GetName():match("WowLuaButton_(.+)"):gsub("_", " ")
 	GameTooltip:SetText(operation)
 	if tooltips[operation] then
 		GameTooltip:AddLine(tooltips[operation], 1, 1, 1)
@@ -198,135 +252,229 @@ function WowLua.Button_OnEnter(self)
 	GameTooltip:Show();
 end
 
-function WowLua.Button_OnLeave(self)
+function WowLua:Button_OnLeave(frame)
 	GameTooltip:Hide()
 end
 
-function WowLua.Button_OnClick(self)
-	local operation = self:GetName():match("WowLuaButton_(.+)")
+function WowLua:UpdateButtons()
+end
+
+function WowLua:Button_OnClick(button)
+	local operation = button:GetName():match("WowLuaButton_(.+)")
 	if operation == "New" then
-		WowLua.NewPage()
+		WowLua:Button_New(button)
 	elseif operation == "Open" then
-		WowLua.OpenPage()
-	elseif operation == "Save_As" then
-		WowLua.SavePageAs()
+		WowLua:Button_Open(button)
+	elseif operation == "Save" then
+		WowLua:Button_Save(button)
 	elseif operation == "Undo" then
-		WowLua.Undo()
+		WowLua:Button_Undo(button)
 	elseif operation == "Delete" then
-		WowLua.DeletePage()
+		WowLua:Button_Delete(button)
 	elseif operation == "Lock" then
-		WowLua.LockPage()
+		WowLua:Button_Lock(button)
+	elseif operation == "Unlock" then
+		WowLua:Button_Unlock(button)
 	elseif operation == "Previous" then
-		WowLua.PreviousPage()
+		WowLua:Button_Previous(button)
 	elseif operation == "Next" then
-		WowLua.NextPage()
+		WowLua:Button_Next(button)
 	elseif operation == "Run" then
-		WowLua.RunPage()
+		WowLua:Button_Run(button)
 	end
 end
 
-function WowLua.CommitPage()
-	local page = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaDB.pages[page] = WowLuaFrameEditBox:GetText()
+function WowLua:Button_New(button)
+	-- Save the page we're currently editing
+	self:Button_Save()
+
+	-- Create a new page and display it
+	local entry, num = WowLua:CreateNewPage()
+
+	WowLuaFrameEditBox:SetText(entry.content)
+	WowLua:UpdateButtons()
+	WowLua:SetTitle(false)
 end
 
-function WowLua.SetPrevNextStates()
-	local tex = WowLuaButton_Previous:GetNormalTexture()
-	local cPage = WowLuaDB.currentPage
-	if cPage == 1 then
+function WowLua:Button_Open(button)
+end
+
+StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
+	text = "Rename page '%s' to:",
+	button1 = TEXT(OKAY),
+	button2 = TEXT(CANCEL),
+	OnAccept = function()		
+		local name = this:GetParent():GetName().."EditBox"
+		local button = getglobal(name)
+		local text = button:GetText()
+		WowLua:RenamePage(WowLua.save_as, text)
+		WowLua:SetTitle()
+	end,
+	timeout = 0,
+	whileDead = 1,
+	exclusive = 1,
+	showAlert = 1,
+	hideOnEscape = 1,
+	hasEditBox = 1,
+	maxLetters = 32,
+	OnShow = function()
+		getglobal(this:GetName().."Button1"):Disable();
+		getglobal(this:GetName().."EditBox"):SetFocus();
+	end,
+	OnHide = function()
+		if ( ChatFrameEditBox:IsVisible() ) then
+			ChatFrameEditBox:SetFocus();
+		end
+		getglobal(this:GetName().."EditBox"):SetText("");
+	end,
+	EditBoxOnEnterPressed = function()
+		if ( getglobal(this:GetParent():GetName().."Button1"):IsEnabled() == 1 ) then
+			local name = this:GetParent():GetName().."EditBox"
+			local button = getglobal(name)
+			local text = button:GetText()
+			WowLua:RenamePage(WowLua.save_as, text)
+			WowLua:SetTitle()
+			this:GetParent():Hide();
+		end
+	end,
+	EditBoxOnTextChanged = function ()
+		local editBox = getglobal(this:GetParent():GetName().."EditBox");
+		local txt = editBox:GetText()
+		if #txt > 0 then
+			getglobal(this:GetParent():GetName().."Button1"):Enable();
+		else
+			getglobal(this:GetParent():GetName().."Button1"):Disable();
+		end
+	end,
+	EditBoxOnEscapePressed = function()
+		this:GetParent():Hide();
+		ClearCursor();
+	end
+}
+
+function WowLua:Button_Save(button)
+	if button and IsShiftKeyDown() then
+		-- Show the static popup for renaming
+		local page, entry = self:GetCurrentPage()
+		WowLua.save_as = page
+		StaticPopup_Show("WOWLUA_SAVE_AS", entry.name)
+		return
+	else
+		local text = WowLuaFrameEditBox:GetText()
+		local page = self:GetCurrentPage()
+		self:SavePage(page, text)
+		self:UpdateButtons()
+		self:SetTitle(false)
+	end
+end
+
+function WowLua:Button_Undo(button)
+	local page, entry = self:GetCurrentPage()
+	WowLuaFrameEditBox:SetText(entry.content)
+end
+
+function WowLua:Button_Delete(button)
+	local entry, id = self:GetCurrentPage()
+
+	if self:GetNumPages() == 1 then
+		self:Button_New()
+		self:Button_Previous()
+	end
+
+	self:DeletePage(id)
+	
+	if id > 1 then
+		local entry = self:SelectPage(id - 1)
+		WowLuaFrameEditBox:SetText(entry.content)
+		self.UpdateButtons()
+	end
+end
+
+function WowLua:Button_Lock(button)
+	local entry,id = self:GetCurrentPage()
+	self:LockPage(id, true)
+
+	button:Hide()
+end
+
+StaticPopupDialogs["WOWLUA_UNSAVED"] = {
+	text = "You have unsaved changes on this page that will be lost if you navigate away from it.  Continue?",
+	button1 = TEXT(OKAY),
+	button2 = TEXT(CANCEL),
+	OnAccept = function()
+		local method = WowLua.previous_action
+		WowLua:Button_Undo()
+		WowLua[method](WowLua)
+	end,
+	timeout = 0,
+	whileDead = 1,
+	exclusive = 1,
+	showAlert = 1,
+	hideOnEscape = 1,
+	EditBoxOnEscapePressed = function()
+		this:GetParent():Hide();
+		ClearCursor();
+	end
+}
+
+function WowLua:Button_Previous()
+	if self:IsModified() then
+		-- Display the unsaved changes dialog
+		self.previous_action = "Button_Previous"
+		StaticPopup_Show("WOWLUA_UNSAVED")
+		return
+	end
+
+	local current = self:GetCurrentPage()
+	local entry = self:SelectPage(current - 1)
+	
+	WowLuaFrameEditBox:SetText(entry.content)
+	self:UpdateButtons()
+	self:SetTitle(false)
+end
+
+function WowLua:Button_Next()
+	if self:IsModified() then
+		-- Display the unsaved changes dialog
+		self.previous_action = "Button_Next"
+		StaticPopup_Show("WOWLUA_UNSAVED")
+		return
+	end
+
+	local current = self:GetCurrentPage()
+	local entry = self:SelectPage(current + 1)
+	
+	WowLuaFrameEditBox:SetText(entry.content)
+	self:UpdateButtons()
+	self:SetTitle(false)
+end
+
+function WowLua:UpdateButtons()
+	local current = self:GetCurrentPage()
+	local max = self:GetNumPages()
+
+	if current == 1 then
 		WowLuaButton_Previous:Disable()
-		SetDesaturation(tex, true)
 	else
 		WowLuaButton_Previous:Enable()
-		SetDesaturation(tex, false)
 	end
-	
-	tex = WowLuaButton_Next:GetNormalTexture()
-	if cPage == #WowLuaDB.pages then
+
+	if current == max then
 		WowLuaButton_Next:Disable()
-		SetDesaturation(tex, true)
 	else
 		WowLuaButton_Next:Enable()
-		SetDesaturation(tex, false)
 	end
 end
 
-function WowLua.NewPage()
-	WowLua.CommitPage()
-	WowLuaFrameEditBox:SetText("")
-	WowLuaDB.untitled = WowLuaDB.untitled + 1
-	WowLuaDB.pages[#WowLuaDB.pages + 1] = string.format("Untitled %d", WowLuaDB.untitled)
-	WowLuaDB.currentPage = #WowLuaDB.pages
-	WowLua.SetPrevNextStates()
-	WowLua.SetTitle()
-end
-
-function WowLua.OpenPage()
-end
-
-function WowLua.OpenDropDownOnLoad(self)
-	--UIDropDownMenu_Initialize(self, WowLua.
-end
-
-function WowLua.SavePageAs()
-end
-
-function WowLua.Undo()
-	local page = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaFrameEditBox:SetText(WowLuaDB.pages[page])
-end
-
-function WowLua.DeletePage()
-	if #WowLuaDB.pages == 1 then
-		WowLua.NewPage()
-		WowLua.PreviousPage()
-	end
-	local page = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaDB.pages[page] = nil
-	table.remove(WowLuaDB.pages, WowLuaDB.currentPage)
-	if WowLuaDB.currentPage > 1 then
-		WowLuaDB.currentPage = WowLuaDB.currentPage - 1
-	end
-	local page = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaFrameEditBox:SetText(WowLuaDB.pages[page])
-	WowLua.SetPrevNextStates()
-	WowLua.SetTitle()
-end
-
-function WowLua.LockPage()
-end
-
-function WowLua.PreviousPage()
-	local cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-	local text = WowLuaFrameEditBox:GetText()
-	WowLuaDB.pages[cPage] = text
-	WowLuaDB.currentPage = WowLuaDB.currentPage - 1
-	cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaFrameEditBox:SetText(WowLuaDB.pages[cPage] or "")
-	WowLua.SetPrevNextStates()
-	WowLua.SetTitle()
-end
-
-function WowLua.NextPage()
-	local cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-	local text = WowLuaFrameEditBox:GetText()
-	WowLuaDB.pages[cPage] = text
-	WowLuaDB.currentPage = WowLuaDB.currentPage + 1
-	cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaFrameEditBox:SetText(WowLuaDB.pages[cPage] or "")
-	WowLua.SetPrevNextStates()
-	WowLua.SetTitle()
-end
-
-function WowLua.RunPage()
+function WowLua:RunPage()
 	-- Run the script, if there is an error then highlight it
 	local text = WowLuaFrameEditBox:GetText()
 	if text then
-		local succ,err = WowLua.RunScript(text)
+		local succ,err = WowLua:RunScript(text)
 		if not succ then
 			local chunkName,lineNum = err:match("(%b[]):(%d+):")
 			lineNum = tonumber(lineNum)
-			WowLua.UpdateLineNums(lineNum)
+			WowLua:UpdateLineNums(lineNum)
 
 			-- Highlight the text in the editor by finding the char of the line number we're on
 			text = WowLua.indent.coloredGetText(WowLuaFrameEditBox)
@@ -348,25 +496,27 @@ function WowLua.RunPage()
 	end
 end
 
-function WowLua.SetTitle()
-	local pageName = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaFrameTitle:SetText(pageName.." - WowLua Editor")
+function WowLua:IsModified()
+	local page,entry = self:GetCurrentPage()
+	local orig = entry.content
+	local current = WowLuaFrameEditBox:GetText(true)
+	return orig ~= current
 end
 
+function WowLua:SetTitle(modified)
+	local page,entry = self:GetCurrentPage()
+	WowLuaFrameTitle:SetFormattedText("%s%s - WowLua Editor", entry.name, self:IsModified() and "*" or "")
+end
+
+local first = true
 local function slashHandler(txt)
-	local page = WowLuaDB.pages[WowLuaDB.currentPage]
-	WowLuaFrameEditBox:SetText(WowLuaDB.pages[page] or "")
-	if WowLuaDB.currentPage == 1 then
-		WowLuaButton_Previous:Disable()
-		SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),true)
+	local page, entry = WowLua:GetCurrentPage()
+	if first then
+		WowLuaFrameEditBox:SetText(entry.content)
+		first = false
 	end
-	if WowLuaDB.currentPage == #WowLuaDB.pages then 
-		WowLuaButton_Next:Disable() 
-		SetDesaturation(WowLuaButton_Next:GetNormalTexture(),true)
-	end
-	--WowLua:CreateFrame()
+
 	WowLuaFrame:Show()
-	WowLua.SetTitle()
 	
 	if processSpecialCommands(txt) then
 		return
@@ -383,9 +533,9 @@ SLASH_WOWLUA1 = "/wowlua"
 SLASH_WOWLUA2 = "/lua"
 SlashCmdList["WOWLUA"] = slashHandler
 
-function WowLua.OnSizeChanged(self)
+function WowLua:OnSizeChanged(frame)
 	-- The first graphic is offset 13 pixels to the right
-	local width = self:GetWidth() - 13
+	local width = frame:GetWidth() - 13
 	local bg2w,bg3w,bg4w = 0,0,0
 
 	-- Resize bg2 up to 256 width
@@ -446,20 +596,20 @@ function WowLua.OnSizeChanged(self)
 	end
 end
 
-function WowLua.ResizeBar_OnMouseDown(self, button)
-	self.cursorStart = select(2, GetCursorPosition())
-	self.anchorStart = select(5, self:GetPoint())
-	self:SetScript("OnUpdate", WowLua.ResizeBar_OnUpdate)
+function WowLua:ResizeBar_OnMouseDown(frame, button)
+	frame.cursorStart = select(2, GetCursorPosition())
+	frame.anchorStart = select(5, frame:GetPoint())
+	frame:SetScript("OnUpdate", function(...) WowLua:ResizeBar_OnUpdate(...) end)
 end
 
-function WowLua.ResizeBar_OnMouseUp(self, button)
-	self:SetScript("OnUpdate", nil)
+function WowLua:ResizeBar_OnMouseUp(frame, button)
+	frame:SetScript("OnUpdate", nil)
 end
 
-function WowLua.ResizeBar_OnUpdate(self, elapsed)
-	local parent = self:GetParent()
+function WowLua:ResizeBar_OnUpdate(frame, elapsed)
+	local parent = frame:GetParent()
 	local cursorY = select(2, GetCursorPosition())
-	local newPoint = self.anchorStart - (self.cursorStart - cursorY)/self:GetEffectiveScale()
+	local newPoint = frame.anchorStart - (frame.cursorStart - cursorY)/frame:GetEffectiveScale()
 	local maxPoint = parent:GetHeight() - 175; 
 
 	if newPoint < 100 then
@@ -468,12 +618,12 @@ function WowLua.ResizeBar_OnUpdate(self, elapsed)
 		newPoint = maxPoint
 	end
 
-	self:ClearAllPoints()
-	self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 14, newPoint)
-	self:SetPoint("TOPRIGHT", parent, "BOTTOMRIGHT", 0, newPoint)
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 14, newPoint)
+	frame:SetPoint("TOPRIGHT", parent, "BOTTOMRIGHT", 0, newPoint)
 end
 
-function WowLua.OnVerticalScroll(scrollFrame)
+function WowLua:OnVerticalScroll(scrollFrame)
 	local offset = scrollFrame:GetVerticalScroll();
 	local scrollbar = getglobal(scrollFrame:GetName().."ScrollBar");
 	
@@ -499,7 +649,7 @@ function WowLua.OnVerticalScroll(scrollFrame)
 	end
 end
 
-function WowLua.UpdateLineNums(highlightNum)
+function WowLua:UpdateLineNums(highlightNum)
 	-- highlightNum is the line number indicated by the error message
 	if highlightNum then 
 		WowLua.highlightNum = highlightNum
@@ -569,7 +719,7 @@ local function canScroll(scroll, direction)
 	return true;
 end
 
-function WowLua.UpdateScrollingMessageFrame(frame)
+function WowLua:UpdateScrollingMessageFrame(frame)
 	local name = frame:GetName();
 	local display = false;
 	
@@ -602,7 +752,7 @@ local scrollMethods = {
 	["end"] = { ["up"] = "ScrollToTop", ["down"] = "ScrollToBottom" },
 };
 
-function WowLua.ScrollingMessageFrameScroll(scroll, direction, type)
+function WowLua:ScrollingMessageFrameScroll(scroll, direction, type)
 	-- Make sure we can scroll first
 	if ( not canScroll(scroll, direction) ) then
 		return;
@@ -611,11 +761,11 @@ function WowLua.ScrollingMessageFrameScroll(scroll, direction, type)
 	scroll[method](scroll);
 end
 
-function WowLua.OnTextChanged(self)
-	self.highlightNum = nil
+function WowLua:OnTextChanged(frame)
+	frame.highlightNum = nil
 end
 
-function WowLua.OnCursorChanged(self)
+function WowLua:OnCursorChanged(frame)
 	WowLua.dirty = true
 end
 

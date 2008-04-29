@@ -1,8 +1,9 @@
-## Interface: 20300
+## Interface: 20400
 ## Title: WowLua
+## Version: wowi:revision 
 ## Author: Cladhaire
-## Notes: Simple interactive Lua interpreter and scratchpad
-## SavedVariables: WowLuaDB
+## Notes: Interactive Lua interpreter and scratchpad
+## SavedVariables: WowLua_DB
 
 WowLua.lua
 WowLuaFrame.lua
