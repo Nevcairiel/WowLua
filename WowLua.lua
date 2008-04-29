@@ -8,10 +8,11 @@
 WowLua = {
 	VERSION = "WowLua 1.0 Interactive Interpreter",
 }
+local L = WowLuaLocals
 
 WowLua_DB = {
 	pages = {
-		[1] = {name = "Untitled 1", content = "", untitled = true}
+		[1] = {name = format(L.NEW_PAGE_TITLE, 1), content = "", untitled = true}
 	},
 	currentPage = 1,
 	untitled = 2,
@@ -20,7 +21,7 @@ WowLua_DB = {
 local DB = {}
 
 function WowLua:CreateNewPage()
-	local name = "Untitled " .. WowLua_DB.untitled
+	local name = format(L.NEW_PAGE_TITLE, WowLua_DB.untitled)
 	WowLua_DB.untitled = WowLua_DB.untitled + 1
 	local entry = {
 		name = name,
@@ -98,10 +99,10 @@ if not print then
 end
 
 local function processSpecialCommands(txt)
-	if txt == "/reload" then
+	if txt == L.RELOAD_COMMAND then
 		ReloadUI()
 		return true
-	elseif txt == "/reset" then
+	elseif txt == L.RESET_COMMAND then
 		WowLuaFrame:ClearAllPoints()
 		WowLuaFrame:SetPoint("CENTER")
 		WowLuaFrame:SetWidth(640)
@@ -189,7 +190,7 @@ function WowLua:RunScript(text)
 	-- escape any color codes:
 	local output = text:gsub("\124", "\124\124")
 
-	if text == "/reload" then 
+	if text == L.RELOAD_COMMAND then 
 		ReloadUI()
 	end
 
@@ -232,25 +233,13 @@ function WowLua:Initialize(frame)
 	self:UpdateButtons()
 end
 
-local tooltips = {
-	["New"] = "Create a new script page",
-	["Open"] = "Open an existing script page",
-	["Save"] = "Save the current page\n\nHint: You can shift-click this button to rename a page",
-	["Undo"] = "Revert to the last saved version",
-	["Delete"] = "Delete the current page",
-	["Lock"] = "This page is unlocked to allow changes. Click to lock.",
-	["Unlock"] = "This page is locked to prevent changes. Click to unlock.",
-	["Previous"] = "Navigate back one page",
-	["Next"] = "Navigate forward one page",
-	["Run"] = "Run the current script",
-}	
-	
 function WowLua:Button_OnEnter(frame)
 	GameTooltip:SetOwner(this, "ANCHOR_BOTTOM");
 	local operation = frame:GetName():match("WowLuaButton_(.+)"):gsub("_", " ")
-	GameTooltip:SetText(operation)
-	if tooltips[operation] then
-		GameTooltip:AddLine(tooltips[operation], 1, 1, 1)
+	local tooltip = L.TOOLTIPS[operation]
+	GameTooltip:SetText(tooltip and tooltip.name or operation)
+	if tooltip then
+		GameTooltip:AddLine(tooltip.text, 1, 1, 1)
 	end
 	GameTooltip:Show();
 end
@@ -314,7 +303,7 @@ end
 
 function WowLua.OpenDropDownInitialize()
 	UIDropDownMenu_AddButton{
-		text = "Select a Script",
+		text = L.OPEN_MENU_TITLE,
 		isTitle = 1
 	}
 	
@@ -328,7 +317,7 @@ function WowLua.OpenDropDownInitialize()
 end
 
 StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
-	text = "Save page with the following name:",
+	text = L.SAVE_AS_TEXT,
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
 	OnAccept = function()		
@@ -389,7 +378,7 @@ function WowLua:Button_Save(button)
 		local page, entry = self:GetCurrentPage()
 		WowLua.save_as = page
 		WowLua.save_as_name = entry.name
-		StaticPopup_Show("WOWLUA_SAVE_AS")
+		StaticPopup_Show("WOWLUA_SAVE_AS", entry.name)
 		return
 	else
 		local text = WowLuaFrameEditBox:GetText()
@@ -435,7 +424,7 @@ function WowLua:Button_Unlock(button)
 end
 
 StaticPopupDialogs["WOWLUA_UNSAVED"] = {
-	text = "You have unsaved changes on this page that will be lost if you navigate away from it.  Continue?",
+	text = L.UNSAVED_TEXT,
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
 	OnAccept = function()
@@ -498,6 +487,7 @@ function WowLua:UpdateButtons()
 	end
 	
 	self.indent.indentEditbox(WowLuaFrameEditBox)
+
 	if self:IsPageLocked(current) then
 		WowLuaButton_Unlock:Show()
 		WowLuaButton_Lock:Hide()
@@ -574,10 +564,11 @@ function WowLua:SetTitle(modified)
 end
 
 local first = true
-local function slashHandler(txt)
+SlashCmdList["WOWLUA"] = function(txt)
 	local page, entry = WowLua:GetCurrentPage()
 	if first then
 		WowLuaFrameEditBox:SetText(entry.content)
+		WowLua:SetTitle(false)
 		first = false
 	end
 
@@ -593,10 +584,6 @@ local function slashHandler(txt)
 
 	WowLuaFrameCommandEditBox:SetFocus()
 end
-
-SLASH_WOWLUA1 = "/wowlua"
-SLASH_WOWLUA2 = "/lua"
-SlashCmdList["WOWLUA"] = slashHandler
 
 function WowLua:OnSizeChanged(frame)
 	-- The first graphic is offset 13 pixels to the right

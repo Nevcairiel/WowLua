@@ -5,7 +5,8 @@
 ## Notes: Interactive Lua interpreter and scratchpad
 ## SavedVariables: WowLua_DB
 
+Localization.enUS.lua
+
 WowLua.lua
-WowLuaFrame.lua
 FAIAP.lua
 WowLua.xml
