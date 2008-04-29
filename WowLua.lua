@@ -278,14 +278,14 @@ function WowLua.Button_OnClick(self)
 			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),true)
 		else
 			WowLuaButton_Next:Enable()
-			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),true)
+			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),false)
 		end
 		if WowLuaDB.currentPage == 1 then
 			WowLuaButton_Previous:Disable()
 			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),true)
 		else
 			WowLuaButton_Previous:Enable()
-			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),true)
+			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),false)
 		end
 	elseif operation == "Run" then
 		-- Run the script, if there is an error then highlight it
