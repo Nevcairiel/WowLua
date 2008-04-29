@@ -15,6 +15,14 @@
 	</Scripts>
   </Button>
 
+  <Frame name="WowLuaOpenDropdown" inherits="UIDropDownMenuTemplate" frameStrata="FULLSCREEN_DIALOG">
+    <Scripts>
+      <OnLoad>
+        WowLua.OpenDropDownOnLoad(self)
+      </OnLoad>
+    </Scripts>
+  </Frame>
+
   <Frame name="WowLuaFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" resizable="true" frameStrata="MEDIUM">
 	<Size x="640" y="512"/>
 	<Anchors>

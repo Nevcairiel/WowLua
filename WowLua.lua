@@ -205,117 +205,152 @@ end
 function WowLua.Button_OnClick(self)
 	local operation = self:GetName():match("WowLuaButton_(.+)")
 	if operation == "New" then
-		local page = WowLuaDB.pages[WowLuaDB.currentPage]
-		local text = WowLuaFrameEditBox:GetText()
-		WowLuaDB.pages[page] = text
-		WowLuaFrameEditBox:SetText("")
-		WowLuaDB.untitled = WowLuaDB.untitled + 1
-		WowLuaDB.pages[#WowLuaDB.pages + 1] = string.format("Untitled %d", WowLuaDB.untitled)
-		WowLuaDB.currentPage = #WowLuaDB.pages
-		WowLuaButton_Next:Disable()
-		SetDesaturation(WowLuaButton_Next:GetNormalTexture(),true)
-		WowLuaButton_Previous:Enable()
-		SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),false)
+		WowLua.NewPage()
 	elseif operation == "Open" then
+		WowLua.OpenPage()
 	elseif operation == "Save_As" then
+		WowLua.SavePageAs()
 	elseif operation == "Undo" then
-		local page = WowLuaDB.pages[WowLuaDB.currentPage]
-		WowLuaFrameEditBox:SetText(WowLuaDB.pages[page])
+		WowLua.Undo()
 	elseif operation == "Delete" then
-		local page = WowLuaDB.pages[WowLuaDB.currentPage]
-		WowLuaDB.pages[page] = nil
-		table.remove(WowLuaDB.pages, WowLuaDB.currentPage)
-		if WowLuaDB.currentPage > 1 then
-			WowLuaDB.currentPage = WowLuaDB.currentPage - 1
-		end
-		local page = WowLuaDB.pages[WowLuaDB.currentPage]
-		WowLuaFrameEditBox:SetText(WowLuaDB.pages[page])
-		if WowLuaDB.currentPage == 1 then
-			WowLuaButton_Previous:Disable()
-			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),true)
-		else
-			WowLuaButton_Previous:Enable()
-			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),false)
-		end
-		if WowLuaDB.currentPage == #WowLuaDB.pages then
-			WowLuaButton_Next:Disable()
-			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),true)
-		else
-			WowLuaButton_Next:Enable()
-			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),false)
-		end
+		WowLua.DeletePage()
 	elseif operation == "Lock" then
+		WowLua.LockPage()
 	elseif operation == "Previous" then
-		local cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-		local text = WowLuaFrameEditBox:GetText()
-		WowLuaDB.pages[cPage] = text
-		WowLuaDB.currentPage = WowLuaDB.currentPage - 1
-		cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-		WowLuaFrameEditBox:SetText(WowLuaDB.pages[cPage] or "")
-		if WowLuaDB.currentPage == 1 then
-			WowLuaButton_Previous:Disable()
-			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),true)
-		else
-			WowLuaButton_Previous:Enable()
-			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),false)
-		end
-		if WowLuaDB.currentPage == #WowLuaDB.pages then
-			WowLuaButton_Next:Disable()
-			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),true)
-		else
-			WowLuaButton_Next:Enable()
-			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),false)
-		end
+		WowLua.PreviousPage()
 	elseif operation == "Next" then
-		local cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-		local text = WowLuaFrameEditBox:GetText()
-		WowLuaDB.pages[cPage] = text
-		WowLuaDB.currentPage = WowLuaDB.currentPage + 1
-		cPage = WowLuaDB.pages[WowLuaDB.currentPage]
-		WowLuaFrameEditBox:SetText(WowLuaDB.pages[cPage] or "")
-		if WowLuaDB.currentPage == #WowLuaDB.pages then
-			WowLuaButton_Next:Disable()
-			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),true)
-		else
-			WowLuaButton_Next:Enable()
-			SetDesaturation(WowLuaButton_Next:GetNormalTexture(),false)
-		end
-		if WowLuaDB.currentPage == 1 then
-			WowLuaButton_Previous:Disable()
-			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),true)
-		else
-			WowLuaButton_Previous:Enable()
-			SetDesaturation(WowLuaButton_Previous:GetNormalTexture(),false)
-		end
+		WowLua.NextPage()
 	elseif operation == "Run" then
-		-- Run the script, if there is an error then highlight it
-		local text = WowLuaFrameEditBox:GetText()
-		if text then
-			local succ,err = WowLua.RunScript(text)
-			if not succ then
-				local chunkName,lineNum = err:match("(%b[]):(%d+):")
-				lineNum = tonumber(lineNum)
-				WowLua.UpdateLineNums(lineNum)
-
-				-- Highlight the text in the editor by finding the char of the line number we're on
-				text = WowLua.indent.coloredGetText(WowLuaFrameEditBox)
-
-				local curLine,start = 1,1
-				while curLine < lineNum do
-					local s,e = text:find("\n", start)
-					start = e + 1
-					curLine = curLine + 1
-				end
-
-				local nextLine = select(2, text:find("\n", start))
-				
-				WowLuaFrameEditBox:SetFocus()
-				WowLuaFrameEditBox:SetCursorPosition(start - 1)
-			end
-			local page = WowLuaDB.pages[WowLuaDB.currentPage]
-			WowLuaDB.pages[page] = text
-		end
+		WowLua.RunPage()
 	end
+end
+
+function WowLua.CommitPage()
+	local page = WowLuaDB.pages[WowLuaDB.currentPage]
+	WowLuaDB.pages[page] = WowLuaFrameEditBox:GetText()
+end
+
+function WowLua.SetPrevNextStates()
+	local tex = WowLuaButton_Previous:GetNormalTexture()
+	local cPage = WowLuaDB.currentPage
+	if cPage == 1 then
+		WowLuaButton_Previous:Disable()
+		SetDesaturation(tex, true)
+	else
+		WowLuaButton_Previous:Enable()
+		SetDesaturation(tex, false)
+	end
+	
+	tex = WowLuaButton_Next:GetNormalTexture()
+	if cPage == #WowLuaDB.pages then
+		WowLuaButton_Next:Disable()
+		SetDesaturation(tex, true)
+	else
+		WowLuaButton_Next:Enable()
+		SetDesaturation(tex, false)
+	end
+end
+
+function WowLua.NewPage()
+	WowLua.CommitPage()
+	WowLuaFrameEditBox:SetText("")
+	WowLuaDB.untitled = WowLuaDB.untitled + 1
+	WowLuaDB.pages[#WowLuaDB.pages + 1] = string.format("Untitled %d", WowLuaDB.untitled)
+	WowLuaDB.currentPage = #WowLuaDB.pages
+	WowLua.SetPrevNextStates()
+	WowLua.SetTitle()
+end
+
+function WowLua.OpenPage()
+end
+
+function WowLua.OpenDropDownOnLoad(self)
+	--UIDropDownMenu_Initialize(self, WowLua.
+end
+
+function WowLua.SavePageAs()
+end
+
+function WowLua.Undo()
+	local page = WowLuaDB.pages[WowLuaDB.currentPage]
+	WowLuaFrameEditBox:SetText(WowLuaDB.pages[page])
+end
+
+function WowLua.DeletePage()
+	if #WowLuaDB.pages == 1 then
+		WowLua.NewPage()
+		WowLua.PreviousPage()
+	end
+	local page = WowLuaDB.pages[WowLuaDB.currentPage]
+	WowLuaDB.pages[page] = nil
+	table.remove(WowLuaDB.pages, WowLuaDB.currentPage)
+	if WowLuaDB.currentPage > 1 then
+		WowLuaDB.currentPage = WowLuaDB.currentPage - 1
+	end
+	local page = WowLuaDB.pages[WowLuaDB.currentPage]
+	WowLuaFrameEditBox:SetText(WowLuaDB.pages[page])
+	WowLua.SetPrevNextStates()
+	WowLua.SetTitle()
+end
+
+function WowLua.LockPage()
+end
+
+function WowLua.PreviousPage()
+	local cPage = WowLuaDB.pages[WowLuaDB.currentPage]
+	local text = WowLuaFrameEditBox:GetText()
+	WowLuaDB.pages[cPage] = text
+	WowLuaDB.currentPage = WowLuaDB.currentPage - 1
+	cPage = WowLuaDB.pages[WowLuaDB.currentPage]
+	WowLuaFrameEditBox:SetText(WowLuaDB.pages[cPage] or "")
+	WowLua.SetPrevNextStates()
+	WowLua.SetTitle()
+end
+
+function WowLua.NextPage()
+	local cPage = WowLuaDB.pages[WowLuaDB.currentPage]
+	local text = WowLuaFrameEditBox:GetText()
+	WowLuaDB.pages[cPage] = text
+	WowLuaDB.currentPage = WowLuaDB.currentPage + 1
+	cPage = WowLuaDB.pages[WowLuaDB.currentPage]
+	WowLuaFrameEditBox:SetText(WowLuaDB.pages[cPage] or "")
+	WowLua.SetPrevNextStates()
+	WowLua.SetTitle()
+end
+
+function WowLua.RunPage()
+	-- Run the script, if there is an error then highlight it
+	local text = WowLuaFrameEditBox:GetText()
+	if text then
+		local succ,err = WowLua.RunScript(text)
+		if not succ then
+			local chunkName,lineNum = err:match("(%b[]):(%d+):")
+			lineNum = tonumber(lineNum)
+			WowLua.UpdateLineNums(lineNum)
+
+			-- Highlight the text in the editor by finding the char of the line number we're on
+			text = WowLua.indent.coloredGetText(WowLuaFrameEditBox)
+
+			local curLine,start = 1,1
+			while curLine < lineNum do
+				local s,e = text:find("\n", start)
+				start = e + 1
+				curLine = curLine + 1
+			end
+
+			local nextLine = select(2, text:find("\n", start))
+			
+			WowLuaFrameEditBox:SetFocus()
+			WowLuaFrameEditBox:SetCursorPosition(start - 1)
+		end
+		local page = WowLuaDB.pages[WowLuaDB.currentPage]
+		WowLuaDB.pages[page] = text
+	end
+end
+
+function WowLua.SetTitle()
+	local pageName = WowLuaDB.pages[WowLuaDB.currentPage]
+	WowLuaFrameTitle:SetText(pageName.." - WowLua Editor")
 end
 
 local function slashHandler(txt)
@@ -331,6 +366,7 @@ local function slashHandler(txt)
 	end
 	--WowLua:CreateFrame()
 	WowLuaFrame:Show()
+	WowLua.SetTitle()
 	
 	if processSpecialCommands(txt) then
 		return
