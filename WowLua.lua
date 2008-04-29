@@ -236,7 +236,8 @@ local tooltips = {
 	["Save"] = "Save the current page\n\nHint: You can shift-click this button to rename a page",
 	["Undo"] = "Revert to the last saved version",
 	["Delete"] = "Delete the current page",
-	["Lock"] = "Locks/unlocks the current page from being changed",
+	["Lock"] = "This page is unlocked to allow changes. Click to lock.",
+	["Unlock"] = "This page is locked to prevent changes. Click to unlock.",
 	["Previous"] = "Navigate back one page",
 	["Next"] = "Navigate forward one page",
 	["Run"] = "Run the current script",
@@ -254,9 +255,6 @@ end
 
 function WowLua:Button_OnLeave(frame)
 	GameTooltip:Hide()
-end
-
-function WowLua:UpdateButtons()
 end
 
 function WowLua:Button_OnClick(button)
@@ -391,10 +389,15 @@ function WowLua:Button_Delete(button)
 end
 
 function WowLua:Button_Lock(button)
-	local entry,id = self:GetCurrentPage()
+	local id = self:GetCurrentPage()
 	self:LockPage(id, true)
+	self:UpdateButtons()
+end
 
-	button:Hide()
+function WowLua:Button_Unlock(button)
+	local id = self:GetCurrentPage()
+	self:LockPage(id, false)
+	self:UpdateButtons()
 end
 
 StaticPopupDialogs["WOWLUA_UNSAVED"] = {
@@ -452,7 +455,7 @@ end
 function WowLua:UpdateButtons()
 	local current = self:GetCurrentPage()
 	local max = self:GetNumPages()
-
+	
 	if current == 1 then
 		WowLuaButton_Previous:Disable()
 	else
@@ -464,11 +467,39 @@ function WowLua:UpdateButtons()
 	else
 		WowLuaButton_Next:Enable()
 	end
+	
+	self.indent.indentEditbox(WowLuaFrameEditBox)
+	if self:IsPageLocked(current) then
+		WowLuaButton_Unlock:Show()
+		WowLuaButton_Lock:Hide()
+		WowLuaFrameEditBox:SetScript("OnTextChanged", self.lockedTextChanged)
+	else
+		WowLuaButton_Unlock:Hide()
+		WowLuaButton_Lock:Show()
+		WowLuaFrameEditBox:SetScript("OnTextChanged", self.unlockedTextChanged)
+	end
 end
 
-function WowLua:RunPage()
-	-- Run the script, if there is an error then highlight it
+function WowLua.lockedTextChanged(box)
+	if WowLua.reverting then
+		WowLua.reverting = false
+	else
+		WowLua.reverting = true
+		local entry = select(2, WowLua:GetCurrentPage())
+		local pos = WowLua.lastCursorPos
+		box:SetText(entry.content)
+		WowLua.indent.indentEditbox(WowLuaFrameEditBox)
+		if pos then
+			box:SetCursorPosition(pos)
+		end
+	end
+end
+
+function WowLua:Button_Run()
+	self:Button_Save()
 	local text = WowLuaFrameEditBox:GetText()
+	
+	-- Run the script, if there is an error then highlight it
 	if text then
 		local succ,err = WowLua:RunScript(text)
 		if not succ then
@@ -491,8 +522,6 @@ function WowLua:RunPage()
 			WowLuaFrameEditBox:SetFocus()
 			WowLuaFrameEditBox:SetCursorPosition(start - 1)
 		end
-		local page = WowLuaDB.pages[WowLuaDB.currentPage]
-		WowLuaDB.pages[page] = text
 	end
 end
 

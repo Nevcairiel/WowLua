@@ -246,7 +246,7 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\padlock"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\icons\padlock-disabled"/>
 								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
 								<Scripts>
 									<OnHide>
@@ -259,7 +259,7 @@
 									<Anchor point="TOPLEFT" relativeTo="WowLuaButton_Lock" relativePoint="TOPLEFT"/>
 									<Anchor point="BOTTOMRIGHT" relativeTo="WowLuaButton_Lock" relativePoint="BOTTOMRIGHT"/>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\padlock-disabled"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\icons\padlock"/>
 								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
 								<Scripts>
 									<OnHide>
@@ -427,6 +427,11 @@
 							</Anchor>
 							<Anchor point="BOTTOMRIGHT"/>
 						</Anchors>
+						<Scripts>
+							<OnEditFocusGained>
+								self:ClearFocus()
+							</OnEditFocusGained>
+							</Scripts>
 						<FontString font="Interface\AddOns\WowLua\fonts\VeraMono.ttf">
 							<FontHeight val="14"/>
 						</FontString>
@@ -460,6 +465,12 @@
 						<Size>
 							<AbsDimension x="100" y="100"/>
 						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="20" y="0"/>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
 						<Layers>
 							<Layer level="BACKGROUND">
 								<FontString name="$parentLineTest" font="Interface\AddOns\WowLua\fonts\VeraMono.ttf" hidden="true">
@@ -469,15 +480,10 @@
 								</FontString>
 							</Layer>
 						</Layers>
-						<Anchors>
-							<Anchor point="TOPLEFT">
-								<Offset x="20" y="0"/>
-							</Anchor>
-							<Anchor point="BOTTOMRIGHT"/>
-						</Anchors>
 						<Scripts>
 							<OnLoad>
 								WowLua.indent.enable(self, nil, 3)
+								WowLua.unlockedTextChanged = self:GetScript("OnTextChanged")
 							</OnLoad>
 							<OnEscapePressed>
 								self:ClearFocus();
@@ -487,6 +493,8 @@
 								WowLua.highlightNum = nil
 							</OnTextChanged>
 							<OnCursorChanged>
+								WowLua.lastCursorPos = WowLua.cursorPos
+								WowLua.cursorPos = self:GetCursorPosition()
 								ScrollingEdit_OnCursorChanged(x,y,w,h)
 								WowLua:UpdateLineNums()
 								WowLuaFrameEditScrollFrameScrollBar:SetValue(WowLuaFrameEditScrollFrame:GetVerticalScroll())
