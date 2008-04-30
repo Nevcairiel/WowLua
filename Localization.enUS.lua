@@ -8,18 +8,18 @@ L.NEW_PAGE_TITLE = "Untitled %d"
 L.RELOAD_COMMAND = "/reload"
 L.RESET_COMMAND  = "/reset"
 
-L.TOOLTIPS = {
-	["New"] = { name = "New", text = "Create a new script page" },
-	["Open"] = { name = "Open", text = "Open an existing script page" },
-	["Save"] = { name = "Save", text = "Save the current page\n\nHint: You can shift-click this button to rename a page" },
-	["Undo"] = { name = "Undo", text = "Revert to the last saved version" },
-	["Delete"] = { name = "Delete", text = "Delete the current page" },
-	["Lock"] = { name = "Lock", text = "This page is unlocked to allow changes. Click to lock." },
-	["Unlock"] = { name = "Unlock", text = "This page is locked to prevent changes. Click to unlock." },
-	["Previous"] = { name = "Previous", text = "Navigate back one page" },
-	["Next"] = { name = "Next", text = "Navigate forward one page" },
-	["Run"] = { name = "Run", text = "Run the current script" },
-}	
+L.TOOLTIPS = {}
+L.TOOLTIPS["New"] = { name = "New", text = "Create a new script page" }
+L.TOOLTIPS["Open"] = { name = "Open", text = "Open an existing script page" }
+L.TOOLTIPS["Save"] = { name = "Save", text = "Save the current page\n\nHint: You can shift-click this button to rename a page" }
+L.TOOLTIPS["Undo"] = { name = "Undo", text = "Revert to the last saved version" }
+L.TOOLTIPS["Delete"] = { name = "Delete", text = "Delete the current page" }
+L.TOOLTIPS["Lock"] = { name = "Lock", text = "This page is unlocked to allow changes. Click to lock." }
+L.TOOLTIPS["Unlock"] = { name = "Unlock", text = "This page is locked to prevent changes. Click to unlock." }
+L.TOOLTIPS["Previous"] = { name = "Previous", text = "Navigate back one page" }
+L.TOOLTIPS["Next"] = { name = "Next", text = "Navigate forward one page" }
+L.TOOLTIPS["Run"] = { name = "Run", text = "Run the current script" }
+L.TOOLTIPS["Close"] = { name = "Close" }
 	
 L.OPEN_MENU_TITLE = "Select a Script"
 L.SAVE_AS_TEXT = "Save %s with the following name:"

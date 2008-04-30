@@ -159,12 +159,23 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Button name="WowLuaButton_Close" inherits="UIPanelCloseButton">
 				<Anchors>
 					<Anchor point="TOPRIGHT">
 						<Offset x="5" y="-10"/>
 					</Anchor>
 				</Anchors>
+				<Scripts>
+					<OnClick>
+						WowLua:Button_OnClick(self, button)
+					</OnClick>
+					<OnEnter>
+						WowLua:Button_OnEnter(self)
+					</OnEnter>
+					<OnLeave>
+						WowLua:Button_OnLeave(self)
+					</OnLeave>
+				</Scripts>
 			</Button>
 			<Button name="$parentDragHeader">
 				<Size y="60"/>

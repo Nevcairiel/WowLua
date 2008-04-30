@@ -270,6 +270,8 @@ function WowLua:Button_OnClick(button)
 		WowLua:Button_Next(button)
 	elseif operation == "Run" then
 		WowLua:Button_Run(button)
+	elseif operation == "Close" then
+		WowLua:Button_Close(button)
 	end
 end
 
@@ -517,7 +519,6 @@ function WowLua.lockedTextChanged(box)
 end
 
 function WowLua:Button_Run()
-	self:Button_Save()
 	local text = WowLuaFrameEditBox:GetText()
 	
 	-- Run the script, if there is an error then highlight it
@@ -544,6 +545,17 @@ function WowLua:Button_Run()
 			WowLuaFrameEditBox:SetCursorPosition(start - 1)
 		end
 	end
+end
+
+function WowLua:Button_Close()
+	if self:IsModified() then
+		-- Display the unsaved changes dialog
+		local dialog = StaticPopup_Show("WOWLUA_UNSAVED")
+		dialog.data = "Button_Close"
+		return
+	end
+	
+	HideUIPanel(WowLuaFrame)
 end
 
 function WowLua:IsModified()
