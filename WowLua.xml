@@ -201,8 +201,8 @@
 								<Anchors>
 									<Anchor point="LEFT"/>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\new"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\new"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
 							<Button name="WowLuaButton_Open" inherits="WowLuaButtonTemplate">
 								<Anchors>
@@ -210,8 +210,8 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\open"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\open"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
 							<Button name="WowLuaButton_Save" inherits="WowLuaButtonTemplate">
 								<Anchors>
@@ -219,8 +219,8 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\save"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\save"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
 							<Button name="WowLuaButton_Undo" inherits="WowLuaButtonTemplate">
 								<Anchors>
@@ -228,8 +228,8 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\undo"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\undo"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
 							<Button name="WowLuaButton_Delete" inherits="WowLuaButtonTemplate">
 								<Anchors>
@@ -237,8 +237,8 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\delete"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\delete"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
 							<Button name="WowLuaButton_Lock" inherits="WowLuaButtonTemplate">
 								<Anchors>
@@ -246,8 +246,8 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\padlock-disabled"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\padlock-disabled"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 								<Scripts>
 									<OnHide>
 										WowLuaButton_Unlock:Show()
@@ -259,8 +259,8 @@
 									<Anchor point="TOPLEFT" relativeTo="WowLuaButton_Lock" relativePoint="TOPLEFT"/>
 									<Anchor point="BOTTOMRIGHT" relativeTo="WowLuaButton_Lock" relativePoint="BOTTOMRIGHT"/>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\padlock"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\padlock"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 								<Scripts>
 									<OnHide>
 										WowLuaButton_Lock:Show()
@@ -273,9 +273,9 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\left"/>
-								<DisabledTexture file="Interface\AddOns\WowLua\images\icons\left"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\left"/>
+								<DisabledTexture file="Interface\AddOns\WowLua\images\left"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 								<Scripts>
 									<OnLoad>
 										self:GetDisabledTexture():SetDesaturated(true)
@@ -288,9 +288,9 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\right"/>
-								<DisabledTexture file="Interface\AddOns\WowLua\images\icons\right"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\right"/>
+								<DisabledTexture file="Interface\AddOns\WowLua\images\right"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 								<Scripts>
 									<OnLoad>
 										self:GetDisabledTexture():SetDesaturated(true)
@@ -303,8 +303,8 @@
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
-								<NormalTexture file="Interface\AddOns\WowLua\images\icons\run-1"/>
-								<HighlightTexture file="Interface\AddOns\WowLua\images\icons\highlight"/>
+								<NormalTexture file="Interface\AddOns\WowLua\images\run-1"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
 						</Frames>
 					</Frame>
