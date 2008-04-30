@@ -61,7 +61,7 @@
 				</Texture>
 			</Layer>
 			<Layer level="ARTWORK">
-				<Texture name="$parentTopLeft" file="Interface\AddOns\WowLua\images\LightHeaded\TopLeft">
+				<Texture name="$parentTopLeft" file="Interface\AddOns\WowLua\images\topleft">
 					<Size x="128" y="256"/>
 					<Anchors>
 						<Anchor point="TOPLEFT"/>
