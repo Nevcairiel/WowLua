@@ -375,7 +375,7 @@ StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 }
 
 function WowLua:Button_Save(button)
-	if button and (self:IsUntitled() or IsShiftKeyDown()) then
+	if button and IsShiftKeyDown() then
 		-- Show the static popup for renaming
 		local page, entry = self:GetCurrentPage()
 		WowLua.save_as = page
