@@ -585,7 +585,9 @@
 								WowLua.indent.enable(self)
 							</OnLoad>
 							<OnEnterPressed>
-								WowLua:ProcessLine(self:GetText())
+								local text = self:GetText();
+								WowLua:ProcessLine(text);
+								self:AddHistoryLine(text);
 							</OnEnterPressed>
 						</Scripts>
 						<FontString font="Interface\AddOns\WowLua\fonts\VeraMono.ttf">
