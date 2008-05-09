@@ -397,8 +397,14 @@ function WowLua:Button_Undo(button)
 end
 
 function WowLua:Button_Delete(button)
+	if self:IsModified() then
+		-- Display the unsaved changes dialog
+		local dialog = StaticPopup_Show("WOWLUA_UNSAVED")
+		dialog.data = "Button_Delete"
+		return
+	end
+	
 	local page, entry = self:GetCurrentPage()
-
 	if self:GetNumPages() == 1 then
 		self:Button_New()
 		self:Button_Previous()
