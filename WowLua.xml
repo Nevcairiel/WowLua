@@ -506,7 +506,7 @@
 							<OnCursorChanged>
 								WowLua.lastCursorPos = WowLua.cursorPos
 								WowLua.cursorPos = self:GetCursorPosition()
-								ScrollingEdit_OnCursorChanged(x,y,w,h)
+								ScrollingEdit_OnCursorChanged(self, x,y,w,h)
 								WowLua:UpdateLineNums()
 								WowLuaFrameEditScrollFrameScrollBar:SetValue(WowLuaFrameEditScrollFrame:GetVerticalScroll())
 							</OnCursorChanged>
