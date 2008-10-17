@@ -5,10 +5,6 @@
   WowLua is an interactive interpreter for World of Warcraft
 --------------------------------------------------------------------------]]--
 
-function IsWrathBuild()
-	return(tonumber(select(4, GetBuildInfo())) >= 30000)
-end
-
 WowLua = {
 	VERSION = "WowLua 1.0 Interactive Interpreter",
 }

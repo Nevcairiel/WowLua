@@ -506,11 +506,7 @@
 							<OnCursorChanged>
 								WowLua.lastCursorPos = WowLua.cursorPos
 								WowLua.cursorPos = self:GetCursorPosition()
-								if IsWrathBuild() then
-									ScrollingEdit_OnCursorChanged(self,x,y,w,h)
-								else
-									ScrollingEdit_OnCursorChanged(x,y,w,h)
-								end
+								ScrollingEdit_OnCursorChanged(self,x,y,w,h)
 								WowLua:UpdateLineNums()
 								WowLuaFrameEditScrollFrameScrollBar:SetValue(WowLuaFrameEditScrollFrame:GetVerticalScroll())
 							</OnCursorChanged>
