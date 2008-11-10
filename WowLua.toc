@@ -1,8 +1,10 @@
-## Interface: 20400
+## Interface: 30000
 ## Title: WowLua
 ## Version: wowi:revision 
 ## Author: Cladhaire
 ## Notes: Interactive Lua interpreter and scratchpad
+## LoadManagers: AddonLoader
+## X-LoadOn-Shash: /wowlua, /lua
 ## SavedVariables: WowLua_DB
 
 Localization.enUS.lua
