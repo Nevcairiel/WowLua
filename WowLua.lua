@@ -840,3 +840,8 @@ function WowLua:OnCursorChanged(frame)
 	WowLua.dirty = true
 end
 
+BINDING_HEADER_WOWLUA = "WowLua Editor/Interpreter"
+BINDING_NAME_TOGGLE_WOWLUA = "Show/Hide window"
+BINDING_NAME_RUN_WOWLUA = "Run current page"
+BINDING_NAME_SAVE_WOWLUA = "Save current page"
+
