@@ -586,6 +586,7 @@ SlashCmdList["WOWLUA"] = function(txt)
 	local page, entry = WowLua:GetCurrentPage()
 	if first then
 		WowLuaFrameEditBox:SetText(entry.content)
+		WowLuaFrameEditBox:SetWidth(WowLuaFrameEditScrollFrame:GetWidth())
 		WowLua:SetTitle(false)
 		first = false
 	end
