@@ -7,6 +7,8 @@
 
 WowLua = {
 	VERSION = "WowLua 1.0 Interactive Interpreter",
+	queue = {},
+	queuePos = 0,
 }
 local L = WowLuaLocals
 
@@ -258,6 +260,8 @@ function WowLua:Button_OnClick(button)
 		WowLua:Button_Save(button)
 	elseif operation == "Undo" then
 		WowLua:Button_Undo(button)
+	elseif operation == "Redo" then
+		WowLua:Button_Redo(button)
 	elseif operation == "Delete" then
 		WowLua:Button_Delete(button)
 	elseif operation == "Lock" then
@@ -275,6 +279,56 @@ function WowLua:Button_OnClick(button)
 	end
 end
 
+function WowLua:DebugQueue()
+	print("Current queue position: " .. self.queuePos)
+	for k,v in pairs(self.queue) do
+		print(k, v:sub(1, 20))
+	end
+end
+
+function WowLua:FlushQueue()
+	table.wipe(self.queue)
+	self.queuePos = 0
+end
+
+function WowLua:Queue(text)
+	if #self.queue == 0 then
+		local page, entry = WowLua:GetCurrentPage()
+		self.queue[1] = entry.content
+		self.queuePos = 1
+	end
+
+	if text ~= self.queue[self.queuePos] then
+		self.queuePos = self.queuePos+1
+		self.queue[self.queuePos] = text
+		for i=self.queuePos+1,#self.queue do
+			self.queue[i]=nil
+		end
+	end
+end
+
+function WowLua:GetUndoPage()
+	-- Before we do any "Undo", queue the current text
+	WowLua:Queue(WowLuaFrameEditBox:GetText())
+
+	local item = self.queue[self.queuePos-1]
+	if item then 
+		self.queuePos = self.queuePos-1
+		return item
+	end
+
+	return self.queue[self.queuePos]
+end
+
+function WowLua:GetRedoPage()
+	local item = self.queue[self.queuePos+1]
+	if item then
+		self.queuePos = self.queuePos+1
+		return item
+	end
+	return self.queue[self.queuePos]
+end
+
 function WowLua:Button_New(button)
 	if self:IsModified() then
 		-- Display the unsaved changes dialog
@@ -289,6 +343,7 @@ function WowLua:Button_New(button)
 	WowLuaFrameEditBox:SetText(entry.content)
 	WowLua:UpdateButtons()
 	WowLua:SetTitle(false)
+	WowLua:FlushQueue()
 end
 
 function WowLua:Button_Open(button)
@@ -299,7 +354,7 @@ function WowLua:OpenDropDownOnLoad(frame)
 	UIDropDownMenu_Initialize(frame, self.OpenDropDownInitialize)
 end
 
-local function dropDownFunc(page)
+local function dropDownFunc(button, page)
 	WowLua:GoToPage(page)
 end
 
@@ -388,12 +443,20 @@ function WowLua:Button_Save(button)
 		self:SavePage(page, text)
 		self:UpdateButtons()
 		self:SetTitle(false)
+		WowLua:Queue(text)
 	end
 end
 
 function WowLua:Button_Undo(button)
 	local page, entry = self:GetCurrentPage()
-	WowLuaFrameEditBox:SetText(entry.content)
+	local undo = WowLua:GetUndoPage()
+	WowLuaFrameEditBox:SetText(undo or entry.content)
+end
+
+function WowLua:Button_Redo(button)
+	local page, entry = self:GetCurrentPage()
+	local redo = WowLua:GetRedoPage()
+	WowLuaFrameEditBox:SetText(redo)
 end
 
 function WowLua:Button_Delete(button)
@@ -436,7 +499,8 @@ StaticPopupDialogs["WOWLUA_UNSAVED"] = {
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
 	OnAccept = function()
-		WowLua:Button_Undo()
+		local page,entry = WowLua:GetCurrentPage()
+		WowLuaFrameEditBox:SetText(entry.content)
 		local action = this:GetParent().data
 		if type(action) == "string" then
 			WowLua[action](WowLua)
@@ -476,6 +540,7 @@ function WowLua:GoToPage(page)
 	WowLuaFrameEditBox:SetText(entry.content)
 	self:UpdateButtons()
 	self:SetTitle(false)
+	WowLua:FlushQueue()
 end
 
 function WowLua:UpdateButtons()
@@ -526,9 +591,12 @@ end
 
 function WowLua:Button_Run()
 	local text = WowLuaFrameEditBox:GetText()
-	
+
 	-- Run the script, if there is an error then highlight it
 	if text then
+		-- Add the current state of the page to the queue 
+		WowLua:Queue(text)
+
 		local succ,err = WowLua:RunScript(text)
 		if not succ then
 			local chunkName,lineNum = err:match("(%b[]):(%d+):")

@@ -12,7 +12,8 @@ L.TOOLTIPS = {}
 L.TOOLTIPS["New"] = { name = "New", text = "Create a new script page" }
 L.TOOLTIPS["Open"] = { name = "Open", text = "Open an existing script page" }
 L.TOOLTIPS["Save"] = { name = "Save", text = "Save the current page\n\nHint: You can shift-click this button to rename a page" }
-L.TOOLTIPS["Undo"] = { name = "Undo", text = "Revert to the last saved version" }
+L.TOOLTIPS["Undo"] = { name = "Undo", text = "Undo the last change" }
+L.TOOLTIPS["Redo"] = { name = "Redo", text = "Redo the last change" }
 L.TOOLTIPS["Delete"] = { name = "Delete", text = "Delete the current page" }
 L.TOOLTIPS["Lock"] = { name = "Lock", text = "This page is unlocked to allow changes. Click to lock." }
 L.TOOLTIPS["Unlock"] = { name = "Unlock", text = "This page is locked to prevent changes. Click to unlock." }

@@ -242,9 +242,18 @@
 								<NormalTexture file="Interface\AddOns\WowLua\images\undo"/>
 								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
-							<Button name="WowLuaButton_Delete" inherits="WowLuaButtonTemplate">
+							<Button name="WowLuaButton_Redo" inherits="WowLuaButtonTemplate">
 								<Anchors>
 									<Anchor point="LEFT" relativeTo="WowLuaButton_Undo" relativePoint="RIGHT">
+										<Offset x="5" y="0"/>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\AddOns\WowLua\images\redo"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
+							</Button>
+							<Button name="WowLuaButton_Delete" inherits="WowLuaButtonTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="WowLuaButton_Redo" relativePoint="RIGHT">
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
