@@ -649,6 +649,8 @@ function WowLua:SetTitle(modified)
 	WowLuaFrameTitle:SetFormattedText("%s%s - WowLua Editor", entry.name, self:IsModified() and "*" or "")
 end
 
+SLASH_WOWLUA1 = "/lua"
+SLASH_WOWLUA2 = "/wowlua"
 local first = true
 SlashCmdList["WOWLUA"] = function(txt)
 	local page, entry = WowLua:GetCurrentPage()
