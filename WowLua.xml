@@ -657,6 +657,9 @@
 					<OnShow>
 						WowLua:UpdateScrollingMessageFrame(self);
 					</OnShow>
+                    <OnMouseDown>
+                        WowLuaFrameCommandEditBox:SetFocus()
+                    </OnMouseDown>
 				</Scripts>
 				<FontString font="Interface\AddOns\WowLua\fonts\VeraMono.ttf" justifyH="LEFT">
 					<FontHeight val="14"/>
