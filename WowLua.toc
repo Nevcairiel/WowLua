@@ -4,7 +4,7 @@
 ## Author: Cladhaire
 ## Notes: Interactive Lua interpreter and scratchpad
 ## LoadManagers: AddonLoader
-## X-LoadOn-Slash: /wowlua, /lua
+## X-LoadOn-Slash: /wowlua, /lua, /wowluarun, /luarun
 ## SavedVariables: WowLua_DB
 
 Localization.enUS.lua
@@ -12,3 +12,4 @@ Localization.enUS.lua
 WowLua.lua
 FAIAP.lua
 WowLua.xml
+WowLua_Config.lua

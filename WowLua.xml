@@ -23,13 +23,17 @@
 		</Scripts>
 	</Frame>
 
-	<Frame name="WowLuaFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" resizable="true" frameStrata="MEDIUM">
+    <Font name="WowLuaMonoFont" font="Interface\AddOns\WowLua\fonts\VeraMono.ttf">
+		<FontHeight val="14"/>
+    </Font>
+
+	<Frame name="WowLuaFrame" toplevel="true" hidden="true" movable="true" parent="UIParent" enableMouse="true" resizable="true" frameStrata="MEDIUM">
 		<Size x="640" y="512"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
 		<ResizeBounds>
-			<minResize x="365" y="300"/>
+			<minResize x="385" y="300"/>
 		</ResizeBounds>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -286,10 +290,19 @@
 										WowLuaButton_Lock:Show()
 									</OnHide>
 								</Scripts>
+                            </Button>
+                            <Button name="WowLuaButton_Config" inherits="WowLuaButtonTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="WowLuaButton_Lock" relativePoint="RIGHT">
+										<Offset x="5" y="0"/>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\AddOns\WowLua\images\config"/>
+								<HighlightTexture file="Interface\AddOns\WowLua\images\highlight"/>
 							</Button>
 							<Button name="WowLuaButton_Previous" inherits="WowLuaButtonTemplate">
 								<Anchors>
-									<Anchor point="LEFT" relativeTo="WowLuaButton_Lock" relativePoint="RIGHT">
+									<Anchor point="LEFT" relativeTo="WowLuaButton_Config" relativePoint="RIGHT">
 										<Offset x="5" y="0"/>
 									</Anchor>
 								</Anchors>
@@ -451,10 +464,8 @@
 							<OnEditFocusGained>
 								self:ClearFocus()
 							</OnEditFocusGained>
-							</Scripts>
-						<FontString font="Interface\AddOns\WowLua\fonts\VeraMono.ttf">
-							<FontHeight val="14"/>
-						</FontString>
+						</Scripts>
+                        <FontString inherits="WowLuaMonoFont"/>
 					</EditBox>
 				</ScrollChild>
 			</ScrollFrame>
@@ -493,10 +504,9 @@
 						</Anchors>
 						<Layers>
 							<Layer level="BACKGROUND">
-								<FontString name="$parentLineTest" font="Interface\AddOns\WowLua\fonts\VeraMono.ttf" hidden="true">
+								<FontString name="$parentLineTest" inherits="WowLuaMonoFont" hidden="true">
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
 									<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT"/>
-									<FontHeight val="14"/>
 								</FontString>
 							</Layer>
 						</Layers>
@@ -520,12 +530,10 @@
 								WowLuaFrameEditScrollFrameScrollBar:SetValue(WowLuaFrameEditScrollFrame:GetVerticalScroll())
 							</OnCursorChanged>
 							<OnUpdate>
-								ScrollingEdit_OnUpdate(WowLuaFrameEditScrollFrame)
+								ScrollingEdit_OnUpdate(self, elapsed, WowLuaFrameEditScrollFrame)
 							</OnUpdate>
 						</Scripts>
-						<FontString font="Interface\AddOns\WowLua\fonts\VeraMono.ttf">
-							<FontHeight val="14"/>
-						</FontString>
+                        <FontString inherits="WowLuaMonoFont"/>
 					</EditBox>
 				</ScrollChild>
 			</ScrollFrame>
@@ -567,11 +575,10 @@
 						</Texture>
 					</Layer>
 					<Layer level="ARTWORK">
-						<FontString name="$parentPrompt" text="&gt; " font="Interface\AddOns\WowLua\fonts\VeraMono.ttf">
+                        <FontString name="$parentPrompt" text="&gt; " inherits="WowLuaMonoFont">
 							<Anchors>
 								<Anchor point="LEFT"/>
 							</Anchors>
-							<FontHeight val="14"/>
 						</FontString>
 					</Layer>
 				</Layers>
@@ -599,9 +606,7 @@
 								self:AddHistoryLine(text);
 							</OnEnterPressed>
 						</Scripts>
-						<FontString font="Interface\AddOns\WowLua\fonts\VeraMono.ttf">
-							<FontHeight val="14"/>
-						</FontString>
+                        <FontString inherits="WowLuaMonoFont"/>
 					</EditBox>
 				</Frames>
 			</Frame>
@@ -661,9 +666,7 @@
                         WowLuaFrameCommandEditBox:SetFocus()
                     </OnMouseDown>
 				</Scripts>
-				<FontString font="Interface\AddOns\WowLua\fonts\VeraMono.ttf" justifyH="LEFT">
-					<FontHeight val="14"/>
-				</FontString>
+                <FontString inherits="WowLuaMonoFont" justifyH="LEFT"/>
 			</ScrollingMessageFrame>
 		</Frames>
 		<Scripts>

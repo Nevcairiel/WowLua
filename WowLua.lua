@@ -5,8 +5,10 @@
   WowLua is an interactive interpreter for World of Warcraft
 --------------------------------------------------------------------------]]--
 
+local addon = ...
+local version = GetAddOnMetadata("WowLua", "Version") or "SVN"
 WowLua = {
-	VERSION = "WowLua 1.0 Interactive Interpreter",
+	VERSION = "WowLua v" .. version .. " Interactive Interpreter",
 	queue = {},
 	queuePos = 0,
 }
@@ -18,9 +20,24 @@ WowLua_DB = {
 	},
 	currentPage = 1,
 	untitled = 2,
+    fontSize = 14,
 }
 
 local DB = {}
+
+local eframe = CreateFrame("Frame")
+eframe:RegisterEvent("ADDON_LOADED")
+eframe:SetScript("OnEvent", function(self, event, ...)
+    if event == "ADDON_LOADED" then
+        local arg1 = ...
+        if arg1 == addon then
+            if WowLua_DB.fontSize then
+                local file, height, flags = WowLuaMonoFont:GetFont()
+                WowLuaMonoFont:SetFont(file, WowLua_DB.fontSize, flags)
+            end
+        end
+    end
+end)
 
 function WowLua:CreateNewPage()
 	local name = format(L.NEW_PAGE_TITLE, WowLua_DB.untitled)
@@ -74,7 +91,7 @@ function WowLua:SelectPage(id)
 		WowLua_DB.currentPage = id
 		return WowLua_DB.pages[id], id
 	elseif type(id) == "string" then
-		for idx,entry in ipairs(WowLuaDB.pages) do
+		for idx,entry in ipairs(WowLua_DB.pages) do
 			if entry.name == id then
 				WowLua_DB.currentPage = idx
 				return entry, idx
@@ -274,6 +291,8 @@ function WowLua:Button_OnClick(button)
 		WowLua:Button_Next(button)
 	elseif operation == "Run" then
 		WowLua:Button_Run(button)
+    elseif operation == "Config" then
+        WowLua:Button_Config(button)
 	elseif operation == "Close" then
 		WowLua:Button_Close(button)
 	end
@@ -621,6 +640,10 @@ function WowLua:Button_Run()
 	end
 end
 
+function WowLua:Button_Config()
+    InterfaceOptionsFrame_OpenToCategory("WowLua")
+end
+
 function WowLua:Button_Close()
 	if self:IsModified() then
 		-- Display the unsaved changes dialog
@@ -647,31 +670,6 @@ end
 function WowLua:SetTitle(modified)
 	local page,entry = self:GetCurrentPage()
 	WowLuaFrameTitle:SetFormattedText("%s%s - WowLua Editor", entry.name, self:IsModified() and "*" or "")
-end
-
-SLASH_WOWLUA1 = "/lua"
-SLASH_WOWLUA2 = "/wowlua"
-local first = true
-SlashCmdList["WOWLUA"] = function(txt)
-	local page, entry = WowLua:GetCurrentPage()
-	if first then
-		WowLuaFrameEditBox:SetText(entry.content)
-		WowLuaFrameEditBox:SetWidth(WowLuaFrameEditScrollFrame:GetWidth())
-		WowLua:SetTitle(false)
-		first = false
-	end
-
-	WowLuaFrame:Show()
-	
-	if processSpecialCommands(txt) then
-		return
-	end
-
-	if txt:match("%S") then
-		WowLua:ProcessLine(txt)
-	end
-
-	WowLuaFrameCommandEditBox:SetFocus()
 end
 
 function WowLua:OnSizeChanged(frame)
@@ -915,3 +913,54 @@ BINDING_NAME_TOGGLE_WOWLUA = "Show/Hide window"
 BINDING_NAME_RUN_WOWLUA = "Run current page"
 BINDING_NAME_SAVE_WOWLUA = "Save current page"
 
+SLASH_WOWLUA1 = "/lua"
+SLASH_WOWLUA2 = "/wowlua"
+local first = true
+SlashCmdList["WOWLUA"] = function(txt)
+	local page, entry = WowLua:GetCurrentPage()
+	if first then
+		WowLuaFrameEditBox:SetText(entry.content)
+		WowLuaFrameEditBox:SetWidth(WowLuaFrameEditScrollFrame:GetWidth())
+		WowLua:SetTitle(false)
+		first = false
+	end
+
+	WowLuaFrame:Show()
+	
+	if processSpecialCommands(txt) then
+		return
+	end
+
+	if txt:match("%S") then
+		WowLua:ProcessLine(txt)
+	end
+
+	WowLuaFrameCommandEditBox:SetFocus()
+end
+
+local function printf(fmt, ...)
+    print(fmt:format(...))
+end
+
+SLASH_WOWLUARUN1 = "/luarun"
+SLASH_WOWLUARUN2 = "/wowluarun"
+SlashCmdList["WOWLUARUN"] = function(txt, editbox)
+    local entry, idx = WowLua:SelectPage(txt)
+    if not entry then
+        printf("|cFF33FF99WowLua|r: Unable to find a page named '%s'", txt)
+        return
+    else
+        printf("|cFF33FF99WowLua|r: Running page '%s'", txt)
+        local func, err = loadstring(entry.content, "WowLua")
+        if not func then
+            printf("|cFF33FF99WowLua|r: Error compiling page '%s': %s", txt, err)
+        else
+            -- Call the function
+            local succ, err = pcall(func)
+        
+            if not succ then
+                printf("|cFF33FF99WowLua|r: Error while running page '%s': %s", txt, err)
+            end
+        end
+    end
+end

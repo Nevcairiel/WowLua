@@ -20,8 +20,15 @@ L.TOOLTIPS["Unlock"] = { name = "Unlock", text = "This page is locked to prevent
 L.TOOLTIPS["Previous"] = { name = "Previous", text = "Navigate back one page" }
 L.TOOLTIPS["Next"] = { name = "Next", text = "Navigate forward one page" }
 L.TOOLTIPS["Run"] = { name = "Run", text = "Run the current script" }
+L.TOOLTIPS["Config"] = { name = "Config", text = "Open the configuration panel for WowLua" }
 L.TOOLTIPS["Close"] = { name = "Close" }
 	
 L.OPEN_MENU_TITLE = "Select a Script"
 L.SAVE_AS_TEXT = "Save %s with the following name:"
 L.UNSAVED_TEXT = "You have unsaved changes on this page that will be lost if you navigate away from it.  Continue?"
+L.CONFIG_SUBTITLE = "This panel can be used to configure the NinjaPanel LDB display."
+L.CONFIG_TITLE = "%s Configuration"
+L.CONFIG_FONTSIZE = "Font size"
+L.CONFIG_LABEL_FONTSIZE = "Font size:"
+L.CONFIG_FONTSIZE_TOOLTIP = "Configure the font size of the WowLua frame interpreter/editor"
+
