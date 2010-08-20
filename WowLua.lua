@@ -418,10 +418,10 @@ StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 		editBox:HighlightText()
 	end,
 	OnHide = function()
-		if ( ChatFrameEditBox:IsVisible() ) then
-			ChatFrameEditBox:SetFocus();
-		end
-		getglobal(this:GetName().."EditBox"):SetText("");
+        local activeWindow = ChatEdit_GetActiveWindow()
+        if activeWindow then
+            activeWindow:SetText("")
+        end
 	end,
 	EditBoxOnEnterPressed = function()
 		if ( getglobal(this:GetParent():GetName().."Button1"):IsEnabled() == 1 ) then
