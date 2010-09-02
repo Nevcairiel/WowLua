@@ -81,7 +81,7 @@
 					<TexCoords left="0" right="0.546875" top="0" bottom="0.9453125"/>
 				</Texture>
 				<Texture file="Interface\WorldStateFrame\WorldStateFinalScoreFrame-Top">
-					<Size y="242"/>
+					<Size x="0" y="242"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentTopLeft" relativePoint="TOPRIGHT">
 							<Offset x="0" y="-14"/>
@@ -108,8 +108,8 @@
 					</Anchors>
 					<TexCoords left="0" right="0.546875" top="0" bottom="0.65625"/>
 				</Texture>
-				<Texture file="Interface\WorldStateFrame\WorldStateFinalScoreFrame-BotLeft">
-					<Size y="168"/>
+				<Texture name="$parentBotMiddle" file="Interface\WorldStateFrame\WorldStateFinalScoreFrame-BotLeft">
+					<Size x="0" y="168"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentBotLeft" relativePoint="TOPRIGHT"/>
 						<Anchor point="TOPRIGHT" relativeTo="$parentBotRight" relativePoint="TOPLEFT"/>
@@ -182,7 +182,7 @@
 				</Scripts>
 			</Button>
 			<Button name="$parentDragHeader">
-				<Size y="60"/>
+				<Size x="0" y="60"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset x="0" y="-13"/>
@@ -193,7 +193,7 @@
 				</Anchors>
 				<Frames>
 					<Frame name="WowLuaFrameToolbar">
-						<Size y="30"/>
+						<Size x="0" y="30"/>
 						<Anchors>
 							<Anchor point="TOPLEFT">
 								<Offset x="80" y="-26"/>
@@ -357,7 +357,7 @@
 				</Scripts>
 			</Button>
 			<Button name="$parentResizeBar">
-				<Size y="16"/>
+				<Size x="0" y="16"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
 						<Offset x="14" y="100"/>
@@ -387,7 +387,7 @@
 							<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
 						</Texture>
 						<Texture name="$parentBar" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
-							<Size y="16"/>
+							<Size x="0" y="16"/>
 							<Anchors>
 								<Anchor point="LEFT" relativeTo="$parentLeftNub" relativePoint="RIGHT"/>
 								<Anchor point="RIGHT" relativeTo="$parentRightNub" relativePoint="LEFT"/>
@@ -553,7 +553,7 @@
 				</Scripts>
 			</Button>
 			<Frame name="$parentCommand">
-				<Size y="16"/>
+				<Size x="0" y="16"/>
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">
 						<Offset x="18" y="3"/>
