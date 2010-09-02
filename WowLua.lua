@@ -253,7 +253,7 @@ function WowLua:Initialize(frame)
 end
 
 function WowLua:Button_OnEnter(frame)
-	GameTooltip:SetOwner(this, "ANCHOR_BOTTOM");
+	GameTooltip:SetOwner(frame, "ANCHOR_BOTTOM");
 	local operation = frame:GetName():match("WowLuaButton_(.+)"):gsub("_", " ")
 	local tooltip = L.TOOLTIPS[operation]
 	GameTooltip:SetText(tooltip and tooltip.name or operation)
@@ -396,9 +396,9 @@ StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 	text = L.SAVE_AS_TEXT,
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
-	OnAccept = function()		
-		local name = this:GetParent():GetName().."EditBox"
-		local button = getglobal(name)
+	OnAccept = function(self)		
+		local name = self:GetParent():GetName().."EditBox"
+		local button = _G[name]
 		local text = button:GetText()
 		WowLua:RenamePage(WowLua.save_as, text)
 		WowLua:SetTitle()
@@ -410,40 +410,40 @@ StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 	hideOnEscape = 1,
 	hasEditBox = 1,
 	maxLetters = 32,
-	OnShow = function()
-		getglobal(this:GetName().."Button1"):Disable();
-		local editBox = getglobal(this:GetName().."EditBox")
+	OnShow = function(self)
+		getglobal(self:GetName().."Button1"):Disable();
+		local editBox = _G[self:GetName().."EditBox"]
 		editBox:SetFocus()
 		editBox:SetText(WowLua.save_as_name)
 		editBox:HighlightText()
 	end,
-	OnHide = function()
+	OnHide = function(self)
         local activeWindow = ChatEdit_GetActiveWindow()
         if activeWindow then
             activeWindow:SetText("")
         end
 	end,
-	EditBoxOnEnterPressed = function()
-		if ( getglobal(this:GetParent():GetName().."Button1"):IsEnabled() == 1 ) then
-			local name = this:GetParent():GetName().."EditBox"
-			local button = getglobal(name)
+	EditBoxOnEnterPressed = function(self)
+		if _G[self:GetParent():GetName().."Button1"]:IsEnabled() == 1 then
+			local name = self:GetParent():GetName().."EditBox"
+			local button = _G[name]
 			local text = button:GetText()
 			WowLua:RenamePage(WowLua.save_as, text)
 			WowLua:SetTitle()
-			this:GetParent():Hide();
+			self:GetParent():Hide();
 		end
 	end,
-	EditBoxOnTextChanged = function ()
-		local editBox = getglobal(this:GetParent():GetName().."EditBox");
+	EditBoxOnTextChanged = function (self)
+		local editBox = _G[self:GetParent():GetName().."EditBox"];
 		local txt = editBox:GetText()
 		if #txt > 0 then
-			getglobal(this:GetParent():GetName().."Button1"):Enable();
+			_G[self:GetParent():GetName().."Button1"]:Enable();
 		else
-			getglobal(this:GetParent():GetName().."Button1"):Disable();
+			_G[self:GetParent():GetName().."Button1"]:Disable();
 		end
 	end,
-	EditBoxOnEscapePressed = function()
-		this:GetParent():Hide();
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
 		ClearCursor();
 	end
 }
@@ -517,14 +517,14 @@ StaticPopupDialogs["WOWLUA_UNSAVED"] = {
 	text = L.UNSAVED_TEXT,
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
-	OnAccept = function()
+	OnAccept = function(self)
 		local page,entry = WowLua:GetCurrentPage()
 		WowLuaFrameEditBox:SetText(entry.content)
-		local action = this:GetParent().data
+		local action = self:GetParent().data
 		if type(action) == "string" then
 			WowLua[action](WowLua)
 		else
-			WowLua:GoToPage(this:GetParent().data)
+			WowLua:GoToPage(self:GetParent().data)
 		end
 	end,
 	timeout = 0,
@@ -532,8 +532,8 @@ StaticPopupDialogs["WOWLUA_UNSAVED"] = {
 	exclusive = 1,
 	showAlert = 1,
 	hideOnEscape = 1,
-	EditBoxOnEscapePressed = function()
-		this:GetParent():Hide();
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
 		ClearCursor();
 	end
 }
