@@ -555,7 +555,10 @@ function WowLua:GoToPage(page)
 	end
 
 	local entry = self:SelectPage(page)
-	
+	if not entry then
+        return
+    end
+
 	WowLuaFrameEditBox:SetText(entry.content)
 	self:UpdateButtons()
 	self:SetTitle(false)
