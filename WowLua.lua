@@ -397,7 +397,7 @@ StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 	button1 = TEXT(OKAY),
 	button2 = TEXT(CANCEL),
 	OnAccept = function(self)		
-		local name = self:GetParent():GetName().."EditBox"
+		local name = self:GetName().."EditBox"
 		local button = _G[name]
 		local text = button:GetText()
 		WowLua:RenamePage(WowLua.save_as, text)
