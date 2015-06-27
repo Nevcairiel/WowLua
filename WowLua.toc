@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 60200
 ## Title: WowLua
 ## Version: @project-version@ 
 ## Author: Cladhaire
