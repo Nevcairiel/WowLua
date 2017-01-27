@@ -1,6 +1,6 @@
-## Interface: 60200
+## Interface: 70100
 ## Title: WowLua
-## Version: @project-version@ 
+## Version: @project-version@
 ## Author: Cladhaire
 ## Notes: Interactive Lua interpreter and scratchpad
 ## LoadManagers: AddonLoader

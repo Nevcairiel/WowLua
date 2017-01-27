@@ -665,8 +665,12 @@
                     <OnMouseDown>
                         WowLuaFrameCommandEditBox:SetFocus()
                     </OnMouseDown>
+                    <OnLoad>
+                        self:SetFont([[Interface\AddOns\WowLua\fonts\VeraMono.ttf]], 14)
+                        self:SetJustifyH("LEFT")
+                        self:SetFading(False)
+                    </OnLoad>
 				</Scripts>
-                <FontString inherits="WowLuaMonoFont" justifyH="LEFT"/>
 			</ScrollingMessageFrame>
 		</Frames>
 		<Scripts>
