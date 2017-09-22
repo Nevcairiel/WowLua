@@ -678,7 +678,7 @@
 				WowLua:Initialize(self)
 			</OnShow>
 			<OnHide>
-				PlaySound("igMainMenuQuit");
+				PlaySound("SOUNDKIT.IG_MAINMENU_QUIT");
 			</OnHide>
 			<OnSizeChanged>
 				WowLua:OnSizeChanged(self)
