@@ -248,7 +248,7 @@ end
 function WowLua:Initialize(frame)
 	WowLua:OnSizeChanged(frame)
 	table.insert(UISpecialFrames, "WowLuaFrame")
-	PlaySound("SOUNDKIT.IG_MAINMENU_OPEN");
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPEN);
 	self:UpdateButtons()
 end
 
