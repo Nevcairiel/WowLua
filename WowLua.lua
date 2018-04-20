@@ -394,8 +394,8 @@ end
 
 StaticPopupDialogs["WOWLUA_SAVE_AS"] = {
 	text = L.SAVE_AS_TEXT,
-	button1 = TEXT(OKAY),
-	button2 = TEXT(CANCEL),
+	button1 = OKAY,
+	button2 = CANCEL,
 	OnAccept = function(self)
 		local name = self:GetName().."EditBox"
 		local button = _G[name]
@@ -515,8 +515,8 @@ end
 
 StaticPopupDialogs["WOWLUA_UNSAVED"] = {
 	text = L.UNSAVED_TEXT,
-	button1 = TEXT(OKAY),
-	button2 = TEXT(CANCEL),
+	button1 = OKAY,
+	button2 = CANCEL,
 	OnAccept = function(self)
 		local page,entry = WowLua:GetCurrentPage()
 		WowLuaFrameEditBox:SetText(entry.content)
